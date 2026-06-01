@@ -25,3 +25,5 @@ Fonctionnalité Java Robot:
 Installer : 
    - py -m venv .venv : pour installer venv 
    - .\.venv\Scripts\activate aller dans le venv 
+   - pip install fastapi uvicorn : installer fastAPI 
+   - uvicorn main:app --reload : lancer son serv web 
