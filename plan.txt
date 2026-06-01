@@ -8,3 +8,15 @@ Youssef : Sémaphore
 Benjamin : Java, déplacement du robot
 Enzo : Serveur WEB 
 Clément : développement du panneau JAVA
+
+Fonctionnalité Java Controller :
+   - Choisir un semaphore
+   - choisir un symbole
+   - connexion a un serveur 
+   - liste des commandes effectué à stocké
+
+Fonctionnalité Java Robot:
+    - Savoir si un robot est disponible
+    - créer un trhead par robot
+    - Suivre les robots en temps réel
+    - transmission de donnée en arrivant proche d'un sémaphore
