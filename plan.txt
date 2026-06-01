@@ -1,0 +1,3 @@
+Projet Utilisation de github :
+Pour gérer le versionning, la version la plus récente sera toujours sur le main. 
+On va créer une branche développement qui va être merge a chaque nouvelle version
