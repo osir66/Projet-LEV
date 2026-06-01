@@ -20,3 +20,10 @@ Fonctionnalité Java Robot:
     - créer un trhead par robot
     - Suivre les robots en temps réel
     - transmission de donnée en arrivant proche d'un sémaphore
+
+
+Installer : 
+   - py -m venv .venv : pour installer venv 
+   - .\.venv\Scripts\activate aller dans le venv 
+   - pip install fastapi uvicorn : installer fastAPI 
+   - uvicorn main:app --reload : lancer son serv web 
