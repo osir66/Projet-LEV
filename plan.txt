@@ -5,6 +5,6 @@ On va créer une branche développement qui va être merge a chaque nouvelle ver
 Role :
 
 Youssef : Sémaphore
-Benjamin : python, déplacement du robot
+Benjamin : Java, déplacement du robot
 Enzo : Serveur WEB 
 Clément : développement du panneau JAVA
