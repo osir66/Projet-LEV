@@ -6,4 +6,3 @@ app = FastAPI()
 def lire_racine():
     return {"message": "Bienvenue sur mon serveur FastAPI !"}
 
-
