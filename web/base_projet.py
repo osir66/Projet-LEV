@@ -11,7 +11,7 @@ def table():
                         position_actuelle_x REAL,
                         position_actuelle_y REAL,
                         est_disponible BOOLEAN,
-                        vitesse_deplacement REAL
+                        vitesse_deplacement REAL    
                     )''')
         
         c.execute('''CREATE TABLE IF NOT EXISTS SEMAPHORE(
