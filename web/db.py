@@ -73,4 +73,15 @@ def supprimer_robot(id):
         print(f"Error: {e}")
     finally:
         conn.close()
+
+def afficher_robot():
+    conn = sqlite3.connect("Massilia.db")
+    c = conn.cursor()
+    try :
+        c.execute('''SELECT * FROM ROBOT''')
+        afficher_robot = c.fetchall()
+        return afficher_robot
+    except Error as e:
+        print(f"Error: {e}")
+        conn.close()
         

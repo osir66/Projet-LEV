@@ -26,3 +26,7 @@ def ajouter_robot(id: str, position_actuelle_x: float, position_actuelle_y: floa
 @app.post("/suprimer_robot")
 def suprimer_robot(id : str):
     return db.supprimer_robot(id) 
+
+@app.get("/afficher_robot")
+def afficher_robot():
+    return db.afficher_robot()
