@@ -40,6 +40,7 @@ def table():
         
         c.execute('''CREATE TABLE IF NOT EXISTS EQUIPE(
                         id TEXT PRIMARY KEY,
+                        nom_equipe TEXT,
                         ip_equipe TEXT                        
                     )''')
 
