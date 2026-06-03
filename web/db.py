@@ -1,18 +1,22 @@
 import base_projet
 import sqlite3
 from sqlite3 import Error
+import uuid
 
-def ajouter_semaphore(id, etat, dessin_forme, matrice):
+def ajouter_semaphore(etat, dessin_forme, matrice):
     conn = sqlite3.connect("Massilia.db")
+    nouvel_uuid = str(uuid.uuid4())
     print(id, etat, dessin_forme, matrice)
     try :
         c = conn.cursor()
         c.execute('''INSERT INTO SEMAPHORE (id, etat, dessin_forme, matrice) VALUES (?, ?, ?, ?)''',
-              (id, etat, dessin_forme, matrice))
+              (nouvel_uuid, etat, dessin_forme, matrice))
     except Error as e:
         print(f"Error: {e}")
+        return "Erreur lors de l'ajout du semaphore", e
     conn.commit()
     conn.close()
+    return "Semaphore ajouté avec succès"
 
 def afficher_semaphore():
     conn = sqlite3.connect("Massilia.db")
@@ -34,8 +38,10 @@ def supprimer_semaphore(id):
         print("Semaphore avec l'id",id, "a été supprimé.")
     except Error as e:
         print(f"Error: {e}")
+        return "Erreur lors de la suppression du semaphore", e
     finally:
         conn.close()
+        return "Semaphore supprimé avec succès"
 
 def modifier_semaphore(id, etat, dessin_forme, matrice):
     conn = sqlite3.connect("Massilia.db")
@@ -47,8 +53,10 @@ def modifier_semaphore(id, etat, dessin_forme, matrice):
         print("Semaphore avec l'id",id, "a été modifié.")
     except Error as e:
         print(f"Error: {e}")
+        return "Erreur lors de la modification du semaphore", e
     finally:
-        conn.close()    
+        conn.close()  
+        return "Semaphore modifié avec succès"  
 
 def ajouter_robot(id, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement):
     conn = sqlite3.connect("Massilia.db")
@@ -59,8 +67,10 @@ def ajouter_robot(id, position_actuelle_x, position_actuelle_y, est_disponible, 
               (id, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement))
     except Error as e:
         print(f"Error: {e}")
+        return "Erreur lors de l'ajout du robot", e
     conn.commit()
     conn.close()
+    return "Robot ajouté avec succès"
 
 def supprimer_robot(id):
     conn = sqlite3.connect("Massilia.db")
@@ -71,8 +81,10 @@ def supprimer_robot(id):
         print("Robot avec l'id",id, "a été supprimé.")
     except Error as e:
         print(f"Error: {e}")
+        return "Erreur lors de la suppression du robot", e
     finally:
         conn.close()
+        return "Robot supprimé avec succès"
 
 def afficher_robot():
     conn = sqlite3.connect("Massilia.db")
@@ -84,4 +96,34 @@ def afficher_robot():
     except Error as e:
         print(f"Error: {e}")
         conn.close()
-        
+
+   
+def ajouter_equipe(nom_equipe, ip_equipe):
+    conn = sqlite3.connect("Massilia.db")
+    nouvel_uuid = str(uuid.uuid4())
+    print(id, nom_equipe, ip_equipe)
+    try :
+        c = conn.cursor()
+        c.execute('''INSERT INTO EQUIPE (id, nom_equipe, ip_equipe) VALUES (?, ?, ?)''',
+              (nouvel_uuid, nom_equipe, ip_equipe))
+    except Error as e:
+        print(f"Error: {e}")
+        return "Erreur lors de l'ajout de l'équipe", e 
+    conn.commit()
+    conn.close()
+    return "Equipe ajouté avec succès"
+
+def ajouter_forme(type_forme):
+    conn = sqlite3.connect("Massilia.db")
+    nouvel_uuid = str(uuid.uuid4())
+    print(id, type_forme)
+    try :
+        c = conn.cursor()
+        c.execute('''INSERT INTO FORME (id, type_forme) VALUES (?, ?)''',
+              (nouvel_uuid, type_forme))
+    except Error as e:
+        print(f"Error: {e}")
+        return "Erreur lors de l'ajout de la forme", e 
+    conn.commit()
+    conn.close()
+    return "Forme ajouté avec succès"
