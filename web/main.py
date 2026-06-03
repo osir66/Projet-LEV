@@ -21,8 +21,8 @@ def modifier_semaphore(id : str, etat: bool, dessin_forme: str, matrice: float):
     return db.modifier_semaphore(id,etat, dessin_forme, matrice)
 
 @app.post("/ajouter_robot")
-def ajouter_robot(id: str, position_actuelle_x: float, position_actuelle_y: float, est_disponible: bool, vitesse_deplacement: float):
-    return db.ajouter_robot(id, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement)
+def ajouter_robot(position_actuelle_x: float, position_actuelle_y: float, est_disponible: bool, vitesse_deplacement: float):
+    return db.ajouter_robot(position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement)
 
 @app.delete("/suprimer_robot")
 def suprimer_robot(id : str):
@@ -39,3 +39,7 @@ def ajouter_equipe(nom_equipe: str, ip_equipe: str):
 @app.post("/ajouter_forme")
 def ajouter_forme(type_forme: str):
     return db.ajouter_forme(type_forme)
+
+@app.get("/afficher_forme")
+def afficher_forme():
+    return db.afficher_forme()
