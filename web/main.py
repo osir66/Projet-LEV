@@ -1,6 +1,7 @@
 import db
 import base_projet
 from fastapi import FastAPI
+import datetime
 
 app = FastAPI()
 
@@ -21,8 +22,8 @@ def modifier_semaphore(id : str, etat: bool, dessin_forme: str, matrice: float):
     return db.modifier_semaphore(id,etat, dessin_forme, matrice)
 
 @app.post("/ajouter_robot")
-def ajouter_robot(position_actuelle_x: float, position_actuelle_y: float, est_disponible: bool, vitesse_deplacement: float):
-    return db.ajouter_robot(position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement)
+def ajouter_robot(nom_robot: str, position_actuelle_x: float, position_actuelle_y: float, est_disponible: bool, vitesse_deplacement: float):
+    return db.ajouter_robot(nom_robot, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement)
 
 @app.delete("/suprimer_robot")
 def suprimer_robot(id : str):
@@ -43,3 +44,7 @@ def ajouter_forme(type_forme: str):
 @app.get("/afficher_forme")
 def afficher_forme():
     return db.afficher_forme()
+
+@app.post("/ajouter_mission")
+def ajouter_mission(id_semaphore : str, id_forme : str, id_robot : str, status : str, heure_exec : datetime.datetime):
+    return db.ajouter_mission(id_semaphore, id_forme, id_robot, status, heure_exec)

@@ -8,6 +8,7 @@ def table():
         c = conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS ROBOT(
                         id TEXT PRIMARY KEY,
+                        nom_robot TEXT,
                         position_actuelle_x REAL,
                         position_actuelle_y REAL,
                         est_disponible BOOLEAN,
@@ -52,3 +53,4 @@ def table():
         conn.close()
 
 #table()
+

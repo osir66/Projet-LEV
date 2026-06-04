@@ -58,14 +58,14 @@ def modifier_semaphore(id, etat, dessin_forme, matrice):
         conn.close()  
         return "Semaphore modifié avec succès"  
 
-def ajouter_robot(position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement):
+def ajouter_robot(nom_robot, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(nouvel_uuid, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement)
+    print(nouvel_uuid, nom_robot, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement)
     try :
         c = conn.cursor()
-        c.execute('''INSERT INTO ROBOT (id, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement) VALUES (?, ?, ?, ?, ?)''',
-              (nouvel_uuid, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement))
+        c.execute('''INSERT INTO ROBOT (id, nom_robot, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement) VALUES (?, ?, ?, ?, ?, ?)''',
+              (nouvel_uuid, nom_robot, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement))
     except Error as e:
         print(f"Error: {e}")
         return "Erreur lors de l'ajout du robot", e
@@ -102,7 +102,7 @@ def afficher_robot():
 def ajouter_equipe(nom_equipe, ip_equipe):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(id, nom_equipe, ip_equipe)
+    print(nouvel_uuid, nom_equipe, ip_equipe)
     try :
         c = conn.cursor()
         c.execute('''INSERT INTO EQUIPE (id, nom_equipe, ip_equipe) VALUES (?, ?, ?)''',
@@ -117,7 +117,7 @@ def ajouter_equipe(nom_equipe, ip_equipe):
 def ajouter_forme(type_forme):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(id, type_forme)
+    print(nouvel_uuid, type_forme)
     try :
         c = conn.cursor()
         c.execute('''INSERT INTO FORME (id, type_forme) VALUES (?, ?)''',
@@ -139,3 +139,18 @@ def afficher_forme():
     except Error as e:
         print(f"Error: {e}")
         conn.close()
+
+def ajouter_mission(id_semaphore, id_forme, id_robot, status, heure_exec):
+    conn = sqlite3.connect("Massilia.db")
+    nouvel_uuid = str(uuid.uuid4())
+    print(nouvel_uuid, id_semaphore, id_forme, id_robot, status, heure_exec)
+    try :
+        c = conn.cursor()
+        c.execute('''INSERT INTO MISSION (id, id_semaphore, id_forme, id_robot, status, heure_exec) VALUES (?, ?, ?, ?, ?, ?)''',
+              (nouvel_uuid, id_semaphore, id_forme, id_robot, status, heure_exec))
+    except Error as e:
+        print(f"Error: {e}")
+        return "Erreur lors de l'ajout de la mission", e 
+    conn.commit()
+    conn.close()
+    return "Mission ajouté avec succès"
