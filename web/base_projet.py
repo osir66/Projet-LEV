@@ -17,6 +17,7 @@ def table():
         
         c.execute('''CREATE TABLE IF NOT EXISTS SEMAPHORE(
                         id TEXT PRIMARY KEY,
+                        nom_semaphore TEXT,
                         etat BOOLEAN,
                         dessin_forme TEXT,
                         matrice REAL

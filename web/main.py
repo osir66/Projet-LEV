@@ -16,12 +16,12 @@ def afficher_semaphore():
     return db.afficher_semaphore()
 
 @app.post("/ajouter_semaphore", tags=["Sémaphores"])
-def ajouter_semaphore( etat: bool, dessin_forme: str, matrice: float):
-    return db.ajouter_semaphore( etat, dessin_forme, matrice)
+def ajouter_semaphore(nom_semaphore: str, etat: bool, dessin_forme: str, matrice: float):
+    return db.ajouter_semaphore(nom_semaphore, etat, dessin_forme, matrice)
 
 @app.put("/modifier_semaphore", tags=["Sémaphores"])
-def modifier_semaphore(id : str, etat: bool, dessin_forme: str, matrice: float):
-    return db.modifier_semaphore(id,etat, dessin_forme, matrice)
+def modifier_semaphore(id : str, nom_semaphore: str, etat: bool, dessin_forme: str, matrice: float):
+    return db.modifier_semaphore(id, nom_semaphore, etat, dessin_forme, matrice)
 
 @app.delete("/supprimer_semaphore", tags=["Sémaphores"])
 def supprimer_semaphore(id: str):

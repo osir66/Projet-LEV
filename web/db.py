@@ -3,14 +3,14 @@ import sqlite3
 from sqlite3 import Error
 import uuid
 
-def ajouter_semaphore(etat, dessin_forme, matrice):
+def ajouter_semaphore(nom_semaphore,etat, dessin_forme, matrice):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(id, etat, dessin_forme, matrice)
+    print(nouvel_uuid, nom_semaphore, etat, dessin_forme, matrice)
     try :
         c = conn.cursor()
-        c.execute('''INSERT INTO SEMAPHORE (id, etat, dessin_forme, matrice) VALUES (?, ?, ?, ?)''',
-              (nouvel_uuid, etat, dessin_forme, matrice))
+        c.execute('''INSERT INTO SEMAPHORE (id,nom_semaphore, etat, dessin_forme, matrice) VALUES (?, ?, ?, ?)''',
+              (nouvel_uuid, nom_semaphore, etat, dessin_forme, matrice))
     except Error as e:
         print(f"Error: {e}")
         return "Erreur lors de l'ajout du semaphore", e
@@ -43,12 +43,12 @@ def supprimer_semaphore(id):
         conn.close()
         return "Semaphore supprimé avec succès"
 
-def modifier_semaphore(id, etat, dessin_forme, matrice):
+def modifier_semaphore(id,nom_semaphore, etat, dessin_forme, matrice):
     conn = sqlite3.connect("Massilia.db")
     c = conn.cursor()
     try :
-        c.execute('''UPDATE SEMAPHORE SET etat = ?, dessin_forme = ?, matrice = ? WHERE id = ?''',
-              (etat, dessin_forme, matrice, id))
+        c.execute('''UPDATE SEMAPHORE SET nom_semaphore = ?, etat = ?, dessin_forme = ?, matrice = ? WHERE id = ?''',
+              (nom_semaphore, etat, dessin_forme, matrice, id))
         conn.commit()
         print("Semaphore avec l'id",id, "a été modifié.")
     except Error as e:
