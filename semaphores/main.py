@@ -1,4 +1,9 @@
 from lettres import LETTRES
+from helice import extraire_points
+
+points = extraire_points(LETTRES['A'])
+for p in points:
+    print(p)
 
 lettre = LETTRES['A']
 

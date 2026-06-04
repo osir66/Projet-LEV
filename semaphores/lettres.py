@@ -4,14 +4,14 @@
 # 3 suivants = couleur en RGB
 
 C_OFF = (0, 0, 0, 0)
-C_A = (1, 255, 0, 0)
-C_B = (1, 0, 0, 255)
-C_C = (1, 0, 255, 0)
-C_TRI = (1, 255, 255, 0)
-C_CAR = (1, 255, 165, 0)
-C_RON = (1, 0, 255, 255)
-C_ETO = (1, 255, 215, 0)
-C_COE = (1, 255, 20, 147)
+C_A = (1, 255, 0, 0) # rouge
+C_B = (1, 0, 0, 255) # Bleu
+C_C = (1, 0, 255, 0) # Vert
+C_TRI = (1, 255, 255, 0) # jaune
+C_CAR = (1, 255, 165, 0) # orange
+C_RON = (1, 0, 255, 255) # Bleu Ciel / Turquoise
+C_ETO = (1, 255, 20, 100) # Rose
+C_COE = (1, 255, 20, 255) # violet
 
 LETTRES = {
     'A': [
