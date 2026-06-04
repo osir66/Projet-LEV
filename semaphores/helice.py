@@ -25,8 +25,7 @@ def extraire_points(lettre):
                 points.append((r, theta, r_couleur, g_couleur, b_couleur))
     return points
 
-# une fonction nommé extraire_points avec le parametre lettre et je penses 
-# que lettre sa sera je sais pas
+# une fonction nommé extraire_points avec le parametre lettre 
 # puis une variable points tableau 
 # puis une boucle qui dit que pour l'index de la ligne et l ligne on enumerate (on numerote avec le parametre lettre) 
 # puis une autre boucle pour la cologne qui donne index et cologne + on numerote et on parametre avec ligne donc sa sera coordonée
