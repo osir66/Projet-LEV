@@ -48,3 +48,4 @@ def afficher_forme():
 @app.post("/ajouter_mission")
 def ajouter_mission(id_semaphore : str, id_forme : str, id_robot : str, status : str, heure_exec : datetime.datetime):
     return db.ajouter_mission(id_semaphore, id_forme, id_robot, status, heure_exec)
+
