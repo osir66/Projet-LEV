@@ -54,20 +54,32 @@ def add_semaphore(nom, duration, type):
     return "Semaphore ajouté avec succès"
 
 
-def update_semaphore(id,nom,duration,state,type):
+def update_semaphore(id, nom, duration, state, type):
     conn = sqlite3.connect("Massilia.db")
     c = conn.cursor()
-    try :
-        c.execute('''UPDATE SEMAPHORES SET name = ?, duration = ?, state = ?, state = ? WHERE id = ?''',
-              (nom, duration, state,type, id))
+    
+    champs = []
+    valeurs = []
+    
+    if nom is not None: champs.append("name = ?"); valeurs.append(nom)
+    if duration is not None: champs.append("duration = ?"); valeurs.append(duration)
+    if state is not None: champs.append("state = ?"); valeurs.append(state)
+    if type is not None: champs.append("type = ?"); valeurs.append(type)
+    
+    if not champs:
+        conn.close()
+        
+    valeurs.append(id)
+    try:
+        c.execute(f'''UPDATE SEMAPHORES SET {', '.join(champs)} WHERE id = ?''', valeurs)
         conn.commit()
-        print("Semaphore avec l'id",id, "a été modifié.")
+        print("Semaphore avec l'id", id, "a été modifié.")
+        return "Semaphore modifié avec succès"
     except Error as e:
-        print("Error:",e)
+        print("Error:", e)
         return "Erreur lors de la modification du semaphore", e
-    conn.close()  
-    return "Semaphore modifié avec succès"  
-
+    finally:
+        conn.close()
 #---------------------------------------------------------------------------------
 
 #------------------------------ Fonctions des Robots ----------------------------------
@@ -139,20 +151,33 @@ def add_robot(nom,state,speed,position_x,position_y):
     conn.close()
     return "Robot ajouté avec succès"
 
-def update_robot(id,nom,state,speed,position_x,position_y):
+def update_robot(id, nom, state, speed, position_x, position_y):
     conn = sqlite3.connect("Massilia.db")
     c = conn.cursor()
-    try :
-        c.execute('''UPDATE ROBOTS SET name = ?, state = ?, speed = ?, position_x = ?, position_y = ? WHERE id = ?''',
-                 (nom, state, speed, position_x, position_y, id))
+    
+    champs = []
+    valeurs = []
+    
+    if nom is not None: champs.append("name = ?"); valeurs.append(nom)
+    if state is not None: champs.append("state = ?"); valeurs.append(state)
+    if speed is not None: champs.append("speed = ?"); valeurs.append(speed)
+    if position_x is not None: champs.append("position_x = ?"); valeurs.append(position_x)
+    if position_y is not None: champs.append("position_y = ?"); valeurs.append(position_y)
+    
+    if not champs:
+        conn.close()
+        
+    valeurs.append(id)
+    try:
+        c.execute(f'''UPDATE ROBOTS SET {', '.join(champs)} WHERE id = ?''', valeurs)
         conn.commit()
-        print("Robot avec l'id",id, "a été modifié.")
+        print("Robot avec l'id", id, "a été modifié.")
+        return "Robot modifié avec succès"
     except Error as e:
-        print(f"Error: {e}")
+        print ("Error:",e)
         return "Erreur lors de la modification du robot", e
-    conn.commit()
-    conn.close()  
-    return "Robot modifié avec succès"
+    finally:
+        conn.close()
     
 #---------------------------------------------------------------------------------
 
@@ -190,19 +215,32 @@ def ajouter_equipe(nom_equipe, ip_equipe,allowed):
     conn.close()
     return "Équipe ajoutée avec succès"
 
-def modifier_equipe(id,ip):
+
+def modifier_equipe(id, name, ip, allowed):
     conn = sqlite3.connect("Massilia.db")
     c = conn.cursor()
-    try :
-        c.execute('''UPDATE TEAMS SET ip = ? WHERE id = ?''',
-              (ip, id))
+    
+    champs = []
+    valeurs = []
+    
+    if name is not None: champs.append("name = ?"); valeurs.append(name)
+    if ip is not None: champs.append("ip = ?"); valeurs.append(ip)
+    if allowed is not None: champs.append("allowed = ?"); valeurs.append(allowed)
+    
+    if not champs:
+        conn.close()
+    
+    valeurs.append(id)
+    try:
+        c.execute(f'''UPDATE TEAMS SET {', '.join(champs)} WHERE id = ?''', valeurs)
         conn.commit()
-        print("L'équipe avec l'id",id, "a été modifié.")
+        print("L'équipe avec l'id", id, "a été modifiée.")
+        return "Equipe modifiée avec succès"
     except Error as e:
-        print("Error:",e)
+        print("Error:", e)
         return "Erreur lors de la modification de l'équipe", e
-    conn.close()  
-    return "Equipe modifié avec succès"
+    finally:
+        conn.close()
 
 
 #---------------------------------------------------------------------------------
@@ -256,23 +294,40 @@ def ajouter_mission(name, semaphore_id, robot_id,shapes_id, team_id,state, start
     conn.close()
     return "Mission ajouté avec succès"
 
-def modifier_mission(id, state):
+
+
+def modifier_mission(id, name, semaphore_id, robot_id, shape_id, state, start_date, end_date, team, time):
     conn = sqlite3.connect("Massilia.db")
     c = conn.cursor()
+    
+    champs = []
+    valeurs = []
+    
+    if name is not None: champs.append("name = ?"); valeurs.append(name)
+    if semaphore_id is not None: champs.append("semaphore_id = ?"); valeurs.append(semaphore_id)
+    if robot_id is not None: champs.append("robot_id = ?"); valeurs.append(robot_id)
+    if shape_id is not None: champs.append("shapes_id = ?"); valeurs.append(shape_id)
+    if state is not None: champs.append("state = ?"); valeurs.append(state)
+    if start_date is not None: champs.append("start_date = ?"); valeurs.append(start_date)
+    if end_date is not None: champs.append("end_date = ?"); valeurs.append(end_date)
+    if team is not None: champs.append("team = ?"); valeurs.append(team)
+    if time is not None: champs.append("time = ?"); valeurs.append(time)
+    
+    if not champs:
+        conn.close()
+    
+    valeurs.append(id)
+    
     try:
-        c.execute('''UPDATE MISSIONS 
-                     SET state = COALESCE(?, state) 
-                     WHERE id = ?''',
-                  (state, id))
-        
+        c.execute(f'''UPDATE MISSIONS SET {', '.join(champs)} WHERE id = ?''', valeurs)
         conn.commit()
-        print("La mission avec l'id",id, "a été modifiée.")
-        return ("Mission modifié :", id)
+        print("La mission avec l'id :", id, "a été modifiée.")
+        return "Mission modifiée avec succès" 
     except Error as e:
-        print(f"Error: {e}")
-    conn.commit()
-    conn.close()  
-    return "Mission modifié"
+        print("Error:", e)
+        return "Erreur lors de la modification de la mission", e  
+    finally:
+        conn.close()
 #---------------------------------------------------------------------------------
 
 #------------------------------ Fonctions des Formes ---------------------------------
@@ -323,5 +378,28 @@ def ajouter_forme(name, image):
     conn.close()
     return "Forme ajoutée avec succès"
 
+
+def update_shape(id, name, image):
+    conn = sqlite3.connect("Massilia.db")
+    c = conn.cursor()
+    
+    champs = []
+    valeurs = []
+    
+    if name is not None: champs.append("name = ?"); valeurs.append(name)
+    if image is not None: champs.append("image = ?"); valeurs.append(image)
+    
+    if not champs:
+        conn.close()
+      
+    valeurs.append(id)
+    try:
+        c.execute(f'''UPDATE SHAPES SET {', '.join(champs)} WHERE id = ?''', valeurs)
+        conn.commit()
+        return "Forme modifiée avec succès"
+    except Error as e:
+        return "Erreur lors de la modification :", e   
+    finally:
+        conn.close()
 
         

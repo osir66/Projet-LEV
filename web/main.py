@@ -59,7 +59,7 @@ def list_robots():
 def get_robot(id: str):
     return db.get_robot(id)
 
-@app.get("/api/robot/{id}/mission", tags=["Robots"])
+@app.get("/robot/{id}/mission", tags=["Robots"])
 def get_robot_mission(id: str):
     return db.get_robot_mission(id)
 
@@ -91,8 +91,12 @@ def add_mission(name : str | None = None, semaphore_id : str| None = None , robo
     return db.ajouter_mission(name, semaphore_id, robot_id,shapes_id, team_id,state, start_date, end_date,team, time)
  
 @app.put("/api/update_mission/{id}", tags=["Missions"])
-def update_mission(id: str, state):
-    return db.modifier_mission(id, state)
+def update_mission(id: str, name: str | None = None, semaphore_id: str | None = None,
+                         robot_id: str | None = None, shape_id: str | None = None,
+                         state: str | None = None, start_date: str | None = None,
+                         end_date: str | None = None, team: str | None = None,
+                         time: str | None = None):
+    return db.modifier_mission(id,name,semaphore_id,robot_id,shape_id,state,start_date,end_date,team,time)
 
 #-----------------------------------------------------------------------------------
 
@@ -107,10 +111,10 @@ def list_equipes():
 def add_team(name: str, ip: str | None = None, allowed: bool = False):
     return db.ajouter_equipe(name, ip, allowed)
 
-@app.put("/api/update_team/{id}")
-def put_team(id : str,ip):
-    return db.modifier_equipe(id,ip)
-
+@app.put("/api/update_team/{id}", tags = ["Équipes"])
+def put_team(id: str, name: str | None = None, ip: str | None = None,
+            allowed: bool | None = None):
+    return db.modifier_equipe(id,name,ip,allowed)
 
 
 #-----------------------------------------------------------------------------------
@@ -121,11 +125,15 @@ def put_team(id : str,ip):
 def list_formes():
     return db.list_formes()
 
-@app.post("/api/get_shapes/{id}", tags=["Formes"])
+@app.post("/api/shapes/{id}", tags=["Formes"])
 def get_shape(id: str):
     return db.get_shape(id)
 
 @app.post("/api/add_shape", tags=["Formes"])
 def add_shape(name: str, image: str):
     return db.ajouter_forme(name, image)
+
+@app.put("/update_shape/{id}", tags = ["Formes"])
+def update_shape (id: str, name: str | None = None, image: str | None = None):
+    return db.update_shape(id,name,image)
 
