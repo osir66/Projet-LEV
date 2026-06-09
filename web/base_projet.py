@@ -11,7 +11,7 @@ def table():
                         name TEXT,
                         state TEXT,
                         speed INTEGER NOT NULL DEFAULT 1,
-                        position_INTEGER NOT NULL DEFAULT 0,
+                        position_x INTEGER NOT NULL DEFAULT 0,
                         position_y INTEGER NOT NULL DEFAULT 0 
                 )''')
         
@@ -53,6 +53,13 @@ def table():
                         ip TEXT,
                         allowed INTEGER                     
                 )''')
+        
+        c.execute('''CREATE TABLE IF NOT EXISTS CONFIG (
+            id             INTEGER PRIMARY KEY CHECK (id = 1),
+            grille         TEXT NOT NULL,
+            nbr_semaphore  INTEGER NOT NULL,
+            nbr_robot      INTEGER NOT NULL
+        )''')
 
         conn.commit()
         print("Tables créées avec succès")
@@ -62,20 +69,11 @@ def table():
         conn.close()
 
 
-def drop_semaphores_table():
-    try:
-        conn = sqlite3.connect("Massilia.db")
-        conn.execute("PRAGMA foreign_keys = 1")
-        c = conn.cursor()
-        c.execute("DROP TABLE IF EXISTS SEMAPHORES")
-        conn.commit()
-        print("Table SEMAPHORES supprimée avec succès")
-    except Error as e:
-        print("Erreur lors de la suppression de la table SEMAPHORES : ", e)
-    finally:
-        conn.close()
+
 
 #table()
+
+
 
 
 
