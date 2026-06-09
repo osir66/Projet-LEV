@@ -38,14 +38,14 @@ def get_semaphore(id):
         conn.close()
 
 
-def add_semaphore(nom, duration, type):
+def add_semaphore(nom, duration, type,coord_x,coord_y):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(nouvel_uuid, nom, duration, type)
+    print(nouvel_uuid, nom, duration, type,coord_x,coord_y)
     try :
         c = conn.cursor()
-        c.execute('''INSERT INTO SEMAPHORES (id,name,duration,type) VALUES (?, ?, ?, ?)''',
-              (nouvel_uuid, nom, duration, type))
+        c.execute('''INSERT INTO SEMAPHORES (id,name,duration,type,coord_x,coord_y) VALUES (?, ?, ?, ?,?,?)''',
+              (nouvel_uuid, nom, duration, type,coord_x,coord_y))
     except Error as e:
         print(f"Error: {e}")
         return "Erreur lors de l'ajout du semaphore", e
@@ -54,7 +54,7 @@ def add_semaphore(nom, duration, type):
     return "Semaphore ajouté avec succès"
 
 
-def update_semaphore(id, nom, duration, state, type):
+def update_semaphore(id, nom, duration, state, type,coord_x,coord_y):
     conn = sqlite3.connect("Massilia.db")
     c = conn.cursor()
     
@@ -65,6 +65,9 @@ def update_semaphore(id, nom, duration, state, type):
     if duration is not None: champs.append("duration = ?"); valeurs.append(duration)
     if state is not None: champs.append("state = ?"); valeurs.append(state)
     if type is not None: champs.append("type = ?"); valeurs.append(type)
+    if coord_x is not None : champs.append("coord_x = ?"); valeurs.append(coord_x)
+    if coord_y is not None : champs.append("coord_y = ?"); valeurs.append(coord_y)
+
     
     if not champs:
         conn.close()
@@ -392,7 +395,7 @@ def update_shape(id, name, image):
     if not champs:
         conn.close()
       
-    valeurs.append(id)
+    valeurs.append(id)  
     try:
         c.execute(f'''UPDATE SHAPES SET {', '.join(champs)} WHERE id = ?''', valeurs)
         conn.commit()
@@ -402,4 +405,61 @@ def update_shape(id, name, image):
     finally:
         conn.close()
 
+
+#---------------------------------------------------------------------------------
+
+#------------------------------ Fonctions des config ---------------------------------
+
+def get_config():
+    conn = sqlite3.connect("Massilia.db")
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    try :
+        c.execute('''SELECT * FROM CONFIG''')
+        afficher_config = [dict(row) for row in c.fetchall()]
+        return afficher_config
+    except Error as e:
+        print(f"Error: {e}")
+        return "Erreur de l'affichage des config", e
+    finally:
+        conn.commit()
+        conn.close()
+
+def add_config(grille,nbr_semaphore,nbr_robot):
+    conn = sqlite3.connect("Massilia.db")
+    config_id = 1
+    print(config_id,grille,nbr_semaphore,nbr_robot)
+    try :
+        c = conn.cursor()
+        c.execute('''INSERT INTO CONFIG (id, grille,nbr_semaphore,nbr_robot) VALUES (?, ?, ?,?)''',
+              (config_id,grille,nbr_semaphore,nbr_robot))
+    except Error as e:
+        print("Error:",e)
+        return "Erreur lors de l'ajout de la config", e 
+    conn.commit()
+    conn.close()
+    return "Config ajoutée avec succès"
+
+
+def update_config(grille,nbr_semaphore,nbr_robot):
+    conn = sqlite3.connect("Massilia.db")
+    c = conn.cursor()
+    
+    champs = []
+    valeurs = []
+    
+    if grille is not None: champs.append("grille = ?"); valeurs.append(grille)
+    if nbr_semaphore is not None: champs.append("nbr_semaphore = ?"); valeurs.append(nbr_semaphore)
+    if nbr_robot is not None : champs.append("nbr_robot = ?"); valeurs.append(nbr_robot)
+    
+    if not champs:
+        conn.close()
         
+    try:
+        c.execute(f'''UPDATE CONFIG SET {', '.join(champs)} WHERE id = 1''', valeurs)
+        conn.commit()
+        return "Config modifiée avec succès"
+    except Error as e:
+        return "Erreur lors de la modification de la configuration :",e   
+    finally:
+        conn.close()

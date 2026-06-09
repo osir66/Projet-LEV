@@ -20,7 +20,9 @@ def table():
                         name TEXT,
                         state TEXT DEFAULT 'Available',
                         duration INTEGER,
-                        type TEXT
+                        type TEXT,
+                        coord_x INTEGER,
+                        coord_y INTEGER 
                 )''')
         
         c.execute('''CREATE TABLE IF NOT EXISTS SHAPES (
@@ -71,10 +73,7 @@ def table():
 
 
 
-#table()
-
-
-
+table()
 
 
 

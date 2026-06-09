@@ -22,14 +22,16 @@ def get_semaphore(id: str):
 
 
 @app.post("/api/add_semaphore", tags=["Sémaphores"])
-def add_semaphore(name: str, duration: int, type: str):
-    return db.add_semaphore(name, duration, type)
+def add_semaphore(name: str, duration: int, type: str,coord_x : int,coord_y:int):
+    return db.add_semaphore(name, duration, type,coord_x,coord_y)
 
 
 @app.put("/api/update_semaphore/{id}", tags=["Sémaphores"])
 def update_semaphore(id: str, name: str | None = None, state: str | None = None,
-                           duration: int | None = None, type: str | None = None):
-    return db.update_semaphore(id, name, duration, state, type)
+                           duration: int | None = None, type: str | None = None,
+                           coord_x : int| None = None,
+                           coord_y : int | None = None):
+    return db.update_semaphore(id, name, duration, state, type,coord_x,coord_y)
 
 #-----------------------------------------------------------------------------------
 
@@ -128,12 +130,12 @@ def update_shape (id: str, name: str | None = None, image: str | None = None):
 
 @app.get("/api/get_config", tags = ["Configuration"])
 def get_config():
-    return "ma fonction"
+    return db.get_config()
 
 @app.post("/api/add_config", tags = ["Configuration"])
-def add_config():
-    return "ma fonction"
+def add_config(grille : str ,nbr_semaphore : int ,nbr_robot : int):
+    return db.add_config(grille,nbr_semaphore,nbr_robot)
 
 @app.put("/api/update_config", tags = ["Configuration"])
-def put_config():
-    return "ma fonction"
+def put_config(grille : str | None = None,nbr_semaphore : int| None = None ,nbr_robot : int| None = None):
+    return db.update_config(grille,nbr_semaphore,nbr_robot)
