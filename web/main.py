@@ -5,47 +5,135 @@ import datetime
 
 app = FastAPI()
 
-@app.get("/afficher_semaphore")
-def afficher_semaphore():
-    return db.afficher_semaphore()
+#@app.get("/)")
+#def page_html():
+    #return "<h1>Bienvenue sur l'API Massilia</h1>"
 
-@app.post("/ajouter_semaphore")
-def ajouter_semaphore( etat: bool, dessin_forme: str, matrice: float):
-    return db.ajouter_semaphore( etat, dessin_forme, matrice)
+#------------------------------ Routes des Sémaphores ----------------------------------
 
-@app.delete("/supprimer_semaphore")
-def supprimer_semaphore(id: str):
-    return db.supprimer_semaphore(id)
+@app.get("/api/list_semaphore", tags=["Sémaphores"])
+def list_semaphore():
+    return db.list_semaphore()
 
-@app.post("/modifier_semaphore")
-def modifier_semaphore(id : str, etat: bool, dessin_forme: str, matrice: float):
-    return db.modifier_semaphore(id,etat, dessin_forme, matrice)
 
-@app.post("/ajouter_robot")
-def ajouter_robot(nom_robot: str, position_actuelle_x: float, position_actuelle_y: float, est_disponible: bool, vitesse_deplacement: float):
-    return db.ajouter_robot(nom_robot, position_actuelle_x, position_actuelle_y, est_disponible, vitesse_deplacement)
+@app.get("/api/semaphore/{id}", tags=["Sémaphores"])
+def get_semaphore(id: str):
+    return db.get_semaphore(id)
 
-@app.delete("/suprimer_robot")
-def suprimer_robot(id : str):
-    return db.supprimer_robot(id) 
 
-@app.get("/afficher_robot")
-def afficher_robot():
-    return db.afficher_robot()
+@app.post("/api/add_semaphore", tags=["Sémaphores"])
+def add_semaphore(name: str, duration: int, type: str):
+    return db.add_semaphore(name, duration, type)
 
-@app.post("/ajouter_equipe")
-def ajouter_equipe(nom_equipe: str, ip_equipe: str):
-    return db.ajouter_equipe(nom_equipe, ip_equipe)
 
-@app.post("/ajouter_forme")
-def ajouter_forme(type_forme: str):
-    return db.ajouter_forme(type_forme)
+@app.put("/api/update_semaphore/{id}", tags=["Sémaphores"])
+def update_semaphore(id: str, name: str | None = None, state: str | None = None,
+                           duration: int | None = None, type: str | None = None):
+    return db.update_semaphore(id, name, duration, state, type)
 
-@app.get("/afficher_forme")
-def afficher_forme():
-    return db.afficher_forme()
+#-----------------------------------------------------------------------------------
 
-@app.post("/ajouter_mission")
-def ajouter_mission(id_semaphore : str, id_forme : str, id_robot : str, status : str, heure_exec : datetime.datetime):
-    return db.ajouter_mission(id_semaphore, id_forme, id_robot, status, heure_exec)
+#------------------------------ Routes des Robots ----------------------------------
 
+@app.get("/api/list_robots", tags=["Robots"])
+def list_robots():
+    return db.list_robots()
+
+@app.get("/api/robot/{id}", tags=["Robots"])
+def get_robot(id: str):
+    return db.get_robot(id)
+
+@app.get("/robot/{id}/mission", tags=["Robots"])
+def get_robot_mission(id: str):
+    return db.get_robot_mission(id)
+
+@app.post("/api/add_robot", tags=["Robots"])
+def add_robot(name: str | None = None, speed: int | None = None,position_x: int | None = None, position_y: int | None = None):
+    return db.add_robot(name,"en cours", speed, position_x, position_y)
+
+@app.put("/api/update_robot/{id}", tags=["Robots"])
+def update_robot(id: str, name: str | None = None, state: str | None = None, speed: int | None = None, 
+                position_x: int | None = None, position_y: int | None = None):
+    return db.update_robot(id, name, state, speed, position_x, position_y)
+
+#-----------------------------------------------------------------------------------
+
+
+#------------------------------ Routes des Missions --------------------------------
+
+@app.get("/api/get_missions", tags=["Missions"])
+def get_missions(team : str):
+    return db.get_mission(team)
+
+@app.get("/api/list_missions", tags=["Missions"])
+def list_missions():
+    return db.list_missions()
+
+@app.post("/api/add_mission", tags=["Missions"])
+def add_mission(name : str | None = None, semaphore_id : str| None = None , robot_id : str | None = None, shape_id: str | None = None , team_id : str | None = None ,state : str ="En attente",
+                start_date : str ="", end_date : str = "",team : str ="", time : int = ""):    
+    return db.ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time)
+ 
+@app.put("/api/update_mission/{id}", tags=["Missions"])
+def update_mission(id: str, name: str | None = None, semaphore_id: str | None = None,
+                         robot_id: str | None = None, shape_id: str | None = None,
+                         state: str | None = None, start_date: str | None = None,
+                         end_date: str | None = None, team: str | None = None,
+                         time: str | None = None):
+    return db.modifier_mission(id,name,semaphore_id,robot_id,shape_id,state,start_date,end_date,team,time)
+
+#-----------------------------------------------------------------------------------
+
+
+#------------------------------ Routes des Équipes ---------------------------------
+
+@app.get("/api/list_teams", tags=["Équipes"])
+def list_equipes():
+    return db.list_equipes()
+
+@app.post("/api/add_team", tags=["Équipes"])
+def add_team(name: str, ip: str | None = None, allowed: bool = False):
+    return db.ajouter_equipe(name, ip, allowed)
+
+@app.put("/api/update_team/{id}", tags = ["Équipes"])
+def put_team(id: str, name: str | None = None, ip: str | None = None,
+            allowed: bool | None = None):
+    return db.modifier_equipe(id,name,ip,allowed)
+
+
+#-----------------------------------------------------------------------------------
+
+#------------------------------ Routes des Formes ---------------------------------
+
+@app.get("/api/list_shapes", tags=["Formes"])
+def list_formes():
+    return db.list_formes()
+
+@app.post("/api/shapes/{id}", tags=["Formes"])
+def get_shape(id: str):
+    return db.get_shape(id)
+
+@app.post("/api/add_shape", tags=["Formes"])
+def add_shape(name: str, image: str):
+    return db.ajouter_forme(name, image)
+
+@app.put("/update_shape/{id}", tags = ["Formes"])
+def update_shape (id: str, name: str | None = None, image: str | None = None):
+    return db.update_shape(id,name,image)
+
+#-----------------------------------------------------------------------------------
+
+#------------------------------ Routes configuration ---------------------------------
+
+
+@app.get("/api/get_config", tags = ["Configuration"])
+def get_config():
+    return "ma fonction"
+
+@app.post("/api/add_config", tags = ["Configuration"])
+def add_config():
+    return "ma fonction"
+
+@app.put("/api/update_config", tags = ["Configuration"])
+def put_config():
+    return "ma fonction"
