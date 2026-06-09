@@ -33,22 +33,6 @@ def update_semaphore(id: str, name: str | None = None, state: str | None = None,
 
 #-----------------------------------------------------------------------------------
 
-
-#------------------------------ Routes des Nœuds ----------------------------------
-
-#@app.get("/list_nodes", tags=["Nodes"])
-#def list_node():
-    #return db.list_nodes()
-
-#@app.post("/add_node", tags=["Nodes"])
-#def add_node
-
-#@app.put("/update_node/{id}", tags=["Nodes"])
-#def update_node
-
-#-----------------------------------------------------------------------------------
-
-
 #------------------------------ Routes des Robots ----------------------------------
 
 @app.get("/api/list_robots", tags=["Robots"])
@@ -86,9 +70,9 @@ def list_missions():
     return db.list_missions()
 
 @app.post("/api/add_mission", tags=["Missions"])
-def add_mission(name : str | None = None, semaphore_id : str| None = None , robot_id : str | None = None, shapes_id: str | None = None , team_id : str | None = None ,state : str ="En attente",
+def add_mission(name : str | None = None, semaphore_id : str| None = None , robot_id : str | None = None, shape_id: str | None = None , team_id : str | None = None ,state : str ="En attente",
                 start_date : str ="", end_date : str = "",team : str ="", time : int = ""):    
-    return db.ajouter_mission(name, semaphore_id, robot_id,shapes_id, team_id,state, start_date, end_date,team, time)
+    return db.ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time)
  
 @app.put("/api/update_mission/{id}", tags=["Missions"])
 def update_mission(id: str, name: str | None = None, semaphore_id: str | None = None,
@@ -137,3 +121,19 @@ def add_shape(name: str, image: str):
 def update_shape (id: str, name: str | None = None, image: str | None = None):
     return db.update_shape(id,name,image)
 
+#-----------------------------------------------------------------------------------
+
+#------------------------------ Routes configuration ---------------------------------
+
+
+@app.get("/api/get_config", tags = ["Configuration"])
+def get_config():
+    return "ma fonction"
+
+@app.post("/api/add_config", tags = ["Configuration"])
+def add_config():
+    return "ma fonction"
+
+@app.put("/api/update_config", tags = ["Configuration"])
+def put_config():
+    return "ma fonction"

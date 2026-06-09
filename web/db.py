@@ -278,15 +278,15 @@ def list_missions():
         conn.commit()
         conn.close()
 
-def ajouter_mission(name, semaphore_id, robot_id,shapes_id, team_id,state, start_date, end_date,team, time):
+def ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(nouvel_uuid, name, semaphore_id, robot_id,shapes_id, team_id,state, start_date, end_date,team, time)
+    print(nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time)
     try :
         c = conn.cursor()
         c.execute('''INSERT INTO MISSIONS (id, name, semaphore_id, robot_id,shapes_id, team_id,state, start_date, end_date,team, time) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)''',
-                (nouvel_uuid, name, semaphore_id, robot_id,shapes_id, team_id,state, start_date, end_date,team, time))
+                (nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time))
     except Error as e:
         print(f"Error: {e}")
         return "Erreur lors de l'ajout de la mission", e 
