@@ -1,11 +1,11 @@
-import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 import java.util.List;
 
-public class semaphore extends VBox {
+public class semaphore {
 
     record Semaphore(String id, int etat, String forme, double matrice, String nom) {}
 
+    //bouchon pour le jalon 2
     public List<Semaphore> semaphores = new ArrayList<>(List.of(
         new Semaphore("edaa6453-bec9-4fef-bfb1-e9ecbc6edcdd", 1, "carre", 1.2, "Nom1"),
         new Semaphore("de0dcb56-4379-4434-8401-cc2fc2c9fc92", 1, "carre", 1.2, "Nom2"),
