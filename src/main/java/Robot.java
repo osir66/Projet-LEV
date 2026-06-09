@@ -23,6 +23,10 @@ public class Robot implements Runnable {
         this.retourBase = false;
     }
 
+    public String getNom() {
+    return nom;
+}
+
     public void setIdServeur(String idServeur) {
         this.id = idServeur;
     }
@@ -30,7 +34,7 @@ public class Robot implements Runnable {
     @Override
     public void run() {
         try {
-            notifierPosition("Disponible");
+            notifierPosition("Available");
         } catch (Exception e) {
             System.err.println("Erreur notification initiale (" + nom + ") : " + e.getMessage());
         }
@@ -38,12 +42,12 @@ public class Robot implements Runnable {
         while (actif) {
             try {
                 if (missionActuelle == null && !retourBase) {
-                    notifierPosition("Disponible");
+                    notifierPosition("Available");
                     verifierNouvelleMission();
                 } else if (missionActuelle != null && !retourBase) {
                     // déplacement
                     seDeplacerVers(missionActuelle.getCibleX(), missionActuelle.getCibleY());
-                    notifierPosition("En cours");
+                    notifierPosition("Pending");
 
                     if (x == missionActuelle.getCibleX() && y == missionActuelle.getCibleY()) {
                         allumerSemaphore();
@@ -58,13 +62,13 @@ public class Robot implements Runnable {
                 } else if (retourBase) {
                     // retour base
                     seDeplacerVers(carte.getBaseX(), carte.getBaseY());
-                    notifierPosition("Retour Base");
+                    notifierPosition("Returning To Base");
 
                     if (x == carte.getBaseX() && y == carte.getBaseY()) {
                         System.out.println("Robot " + nom + " est rentré à la base.");
                         missionActuelle = null;
                         retourBase = false;
-                        notifierPosition("Disponible");
+                        notifierPosition("Available");
                     }
                 }
                 Thread.sleep(1000); // 1 pas/seconde
@@ -90,16 +94,27 @@ public class Robot implements Runnable {
             String reponse = webClient.requeteGet(url);
             
             if (reponse != null && !reponse.trim().isEmpty() && !reponse.trim().equals("[]") && !reponse.contains("detail")) {
-                Missions nouvelleMission = parseJsonMission(reponse);
-                if (nouvelleMission != null && nouvelleMission.getIdMission() != null && !nouvelleMission.getIdMission().isEmpty()) {
-                    if (carte.reserverMission(nouvelleMission.getIdMission())) {
-                        nouvelleMission.setDateDebut(Instant.now().toString());
-                        this.missionActuelle = nouvelleMission;
-                        System.out.println("Robot " + nom + " a intercepté la mission ID: " + missionActuelle.getIdMission());
+                
+                java.util.List<Missions> missionsDisponibles = parserToutesMissions(reponse);
+                
+                for (Missions missionPotentielle : missionsDisponibles) {
+                    if (missionPotentielle != null && missionPotentielle.getIdMission() != null && !missionPotentielle.getIdMission().isEmpty()) {
+                        
+                        if (carte.reserverMission(missionPotentielle.getIdMission())) {
+                            missionPotentielle.setDateDebut(Instant.now().toString());
+                            this.missionActuelle = missionPotentielle;
+                            System.out.println("Robot " + nom + " a intercepté la mission ID: " + missionActuelle.getIdMission());
+                            
+                            String urlUpdate = String.format("/api/update_semaphore/%s?state=Pending", missionActuelle.getIdSemaphore());
+                            webClient.requetePut(urlUpdate, ""); 
+                            
+                            break;
+                        }
                     }
                 }
             }
         } catch (Exception e) {
+            System.err.println("Erreur vérification mission (" + nom + ") : " + e.getMessage());
         }
     }
 
@@ -113,8 +128,8 @@ public class Robot implements Runnable {
 
     private void allumerSemaphore() throws Exception {
         System.out.println("Robot " + nom + " active le sémaphore " + missionActuelle.getIdSemaphore());
-        String url = String.format("/api/update_semaphore/%s?state=%s",
-                missionActuelle.getIdSemaphore(), URLEncoder.encode(missionActuelle.getSymbole(), StandardCharsets.UTF_8));
+        String url = String.format("/api/update_semaphore/%s?state=Pending",
+                missionActuelle.getIdSemaphore());
         webClient.requetePut(url, ""); 
     }
     
@@ -124,7 +139,7 @@ public class Robot implements Runnable {
         
         String url = String.format("/api/update_mission/%s?state=%s&robot_id=%s&start_date=%s&end_date=%s",
                 missionActuelle.getIdMission(), 
-                URLEncoder.encode("En Cours", StandardCharsets.UTF_8),
+                URLEncoder.encode("Pending", StandardCharsets.UTF_8),
                 URLEncoder.encode(this.id, StandardCharsets.UTF_8),
                 dateDebutEncodee,
                 dateFinEncodee);
@@ -177,5 +192,27 @@ public class Robot implements Runnable {
             }
             return json.substring(start, end).trim();
         }
+    }
+
+    private java.util.List<Missions> parserToutesMissions(String jsonTableau) {
+        java.util.List<Missions> liste = new java.util.ArrayList<>();
+
+        String cleanJson = jsonTableau.trim();
+        if (cleanJson.startsWith("[")) 
+            cleanJson = cleanJson.substring(1);
+        if (cleanJson.endsWith("]")) 
+            cleanJson = cleanJson.substring(0, cleanJson.length() - 1);
+
+        String jsonModifie = cleanJson.replace("},{", "}SPLIT{").replace("}, {", "}SPLIT{");
+        
+        String[] blocs = jsonModifie.split("SPLIT");
+
+        for (String bloc : blocs) {
+            Missions m = parseJsonMission(bloc);
+            if (m != null) {
+                liste.add(m);
+            }
+        }
+        return liste;
     }
 }

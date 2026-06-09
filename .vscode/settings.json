@@ -1,6 +1,10 @@
 {
+<<<<<<< HEAD
     "java.project.sourcePaths": [
         "."
     ],
     "java.project.referencedLibraries": []
+=======
+    "java.configuration.updateBuildConfiguration": "interactive"
+>>>>>>> 84bf5da15b514044510342c1b9f5c6d543fa5f9e
 }
