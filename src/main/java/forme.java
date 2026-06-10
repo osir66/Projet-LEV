@@ -5,17 +5,36 @@ public class forme {
 
     record FormeList(String id, String nom) {}
 
-    // regarder HashMap pour faire un truc plus propre buchon pour le jalon 2
-    public List<FormeList> formes = new ArrayList<>(List.of(
-        new FormeList("edaa6453-bec9-4fef-bfb1-e9ecbc6edcdd", "carre"),
-        new FormeList("de0dcb56-4379-4434-8401-cc2fc2c9fc92", "carre"),
-        new FormeList("3affbbb9-940c-478b-9536-8cf579c32eda", "carre"),
-        new FormeList("c58bc953-c2f0-464a-b9f9-400860368c8f", "carre")
-    ));
-    
-    public List<FormeList> getFormes() {
+    public static final List<FormeList> formes = new ArrayList<>();
+
+    public static List<FormeList> getFormes() {
         return formes;
     }
 
-    
+    public static void charger(Communication1 comm) {
+        String json = comm.getListSymboles();
+        List<FormeList> result = new ArrayList<>();
+        int start = 0;
+        while (true) {
+            int debut = json.indexOf('{', start);
+            int fin   = json.indexOf('}', debut);
+            if (debut == -1 || fin == -1) break;
+            String obj = json.substring(debut, fin + 1);
+            String id  = extraireString(obj, "id");
+            String nom = extraireString(obj, "name");
+            result.add(new FormeList(id, nom));
+            start = fin + 1;
+        }
+        formes.clear();
+        formes.addAll(result);
+    }
+
+    private static String extraireString(String obj, String key) {
+        String search = "\"" + key + "\":\"";
+        int s = obj.indexOf(search);
+        if (s == -1) return "";
+        s += search.length();
+        int e = obj.indexOf('"', s);
+        return e == -1 ? "" : obj.substring(s, e);
+    }
 }

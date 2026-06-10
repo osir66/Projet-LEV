@@ -5,10 +5,10 @@ import javafx.stage.Stage;
 public class main extends Application {
     @Override
     public void start(Stage stage) {
-        interfaceCommance panneau = new interfaceCommance();
+        interfaceCommande panneau = new interfaceCommande();
 
-        stage.setScene(new Scene(panneau, 800, 300));
-        stage.setTitle("Projet LEV");
+        stage.setScene(new Scene(panneau, 1200, 700));
+        stage.setTitle("NEXUS // C2");
         stage.show();
     }
 
