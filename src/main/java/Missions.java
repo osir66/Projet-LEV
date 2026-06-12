@@ -5,14 +5,16 @@ public class Missions {
     private boolean termine;
     private int cibleX, cibleY;
     private String dateDebut;
+    private String port;
 
-    public Missions(String idMission, String idSemaphore, String symbole, int cibleX, int cibleY) {
+    public Missions(String idMission, String idSemaphore, String symbole, int cibleX, int cibleY, String port) {
         this.idMission = idMission;
         this.idSemaphore = idSemaphore;
         this.symbole = symbole;
         this.cibleX = cibleX;
         this.cibleY = cibleY;
         this.termine = false;
+        this.port = port;
     }
 
     public String getIdMission() {
@@ -49,5 +51,13 @@ public class Missions {
 
     public void setTermine(boolean termine) { 
         this.termine = termine; 
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 }

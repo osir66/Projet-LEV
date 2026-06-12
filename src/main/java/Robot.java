@@ -162,7 +162,7 @@ public class Robot implements Runnable {
             if (idMission.isEmpty() || idSemaphore.isEmpty()) {
                 return null;
             }
-            return new Missions(idMission, idSemaphore, symbole, cibleX, cibleY);
+            return new Missions(idMission, idSemaphore, symbole, cibleX, cibleY, "8000");
         } catch (Exception e) {
             return null; 
         }
