@@ -9,12 +9,34 @@ public class Carte {
     private List<Robot> listeRobots;
     private Set<String> missionsEnCours;
 
+    private String nomGrille = "Defaut";
+    private int largeurX = 15;
+    private int hauteurY = 15;
+
     private final int baseX = 0;
     private final int baseY = 0;
 
     public Carte() {
         this.listeRobots = new ArrayList<>();
         this.missionsEnCours = new HashSet<>();
+    }
+
+    public void setConfiguration(String nom, int x, int y) {
+        this.nomGrille = nom;
+        this.largeurX = x;
+        this.hauteurY = y;
+    }
+
+    public int getLargeurX() {
+        return largeurX;
+    }
+
+    public int getHauteurY() {
+        return hauteurY;
+    }
+
+    public String getNomGrille() {
+        return nomGrille;
     }
 
     public synchronized void ajouterRobot(Robot r) {
