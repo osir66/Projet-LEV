@@ -53,7 +53,7 @@ public class Communication1 {
         try {
             String lien = this.urlBase + "list_semaphore";
             System.out.println("Recherche sur : " + lien);
-            URL url = new URL(lien);
+URL url = new URL(lien);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
@@ -62,7 +62,6 @@ public class Communication1 {
             if (code == 200) {
                 BufferedReader lecteur = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String reponse = lecteur.readLine();
-                System.out.println(reponse);
                 lecteur.close();
                 System.err.println("Réponse brute : " + reponse);
                 return reponse;

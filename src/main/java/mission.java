@@ -9,16 +9,14 @@ public class mission {
     private String semaphore_id;
     private String team;
     private String time;
-    private String port;
 
-    public mission(String shape_id, String nom, String ip, String semaphore_id , String time, String port) {
+    public mission(String shape_id, String nom, String ip, String semaphore_id , String time) {
         this.shape_id = shape_id;
         this.nom = nom;
         this.ip = ip;
         this.semaphore_id = semaphore_id;
         this.team = "Massilia";
         this.time = time;
-        this.port = port;
     }
 
     public String getShape_id() {
@@ -47,12 +45,9 @@ public class mission {
     }
     public void setIp(String ip) {
         this.ip = ip;
-    }
-    public void setPort(String port) {
-        this.port = port;
-    }
+    }      
 
     public void sendMission() {
-        new Communication1(ip, port).envoieMission(shape_id, nom, Integer.parseInt(time), team, semaphore_id);
+        new Communication1(ip, "8000").envoieMission(shape_id, nom, Integer.parseInt(time), team, semaphore_id);
     }
 }

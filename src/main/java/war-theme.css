@@ -1,0 +1,230 @@
+/* ================================================================
+   HACKER-THEME.CSS — Terminal sécurisé
+   Palette : noir total, vert phosphore, blanc cassé, rouge alerte
+   ================================================================ */
+
+.panneau-guerre {
+    -fx-background-color: #000000;
+    -fx-border-color: #003300;
+    -fx-border-width: 2;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+/* ---------------- En-tête ---------------- */
+
+.entete {
+    -fx-padding: 16 0 14 0;
+    -fx-border-color: transparent transparent #003300 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.titre {
+    -fx-text-fill: #00ff41;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 0.8), 18, 0.5, 0, 0);
+}
+
+.sous-titre {
+    -fx-text-fill: #008f11;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* ---------------- Sections ---------------- */
+
+.section {
+    -fx-background-color: #050505;
+    -fx-border-color: #004400;
+    -fx-border-width: 1;
+    -fx-padding: 12 14 14 14;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+
+.section-titre {
+    -fx-text-fill: #00cc33;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 6 0;
+    -fx-border-color: transparent transparent #003a00 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.libelle {
+    -fx-text-fill: #007a00;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* ---------------- Champs de saisie ---------------- */
+
+.champ,
+.text-field {
+    -fx-background-color: #000000;
+    -fx-text-fill: #00ff41;
+    -fx-prompt-text-fill: #003300;
+    -fx-highlight-fill: #003a00;
+    -fx-border-color: #004400;
+    -fx-border-width: 1;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-padding: 6 8 6 8;
+    -fx-font-size: 13px;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+.champ:focused,
+.text-field:focused {
+    -fx-border-color: #00ff41;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 0.5), 10, 0.3, 0, 0);
+}
+
+/* ---------------- ComboBox ---------------- */
+
+.combo-box {
+    -fx-background-color: #000000;
+    -fx-border-color: #004400;
+    -fx-border-width: 1;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.combo-box:focused,
+.combo-box:hover {
+    -fx-border-color: #00cc33;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #00cc33;
+    -fx-font-size: 13px;
+    -fx-padding: 6 8 6 8;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: #050505;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #00cc33;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #000000;
+    -fx-border-color: #004400;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 0.3), 12, 0.3, 0, 4);
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: #000000;
+    -fx-text-fill: #008f11;
+    -fx-padding: 7 12 7 12;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #001a00;
+    -fx-text-fill: #00ff41;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #003300;
+    -fx-text-fill: #00ff41;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 0.4), 6, 0.2, 0, 0);
+}
+
+/* ---------------- Bouton SCAN ---------------- */
+
+.btn-scan {
+    -fx-background-color: #000000;
+    -fx-text-fill: #00cc33;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-border-color: #004400;
+    -fx-border-width: 1;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-padding: 9 16 9 16;
+    -fx-cursor: hand;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+.btn-scan:hover {
+    -fx-background-color: #001a00;
+    -fx-border-color: #00ff41;
+    -fx-text-fill: #00ff41;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 0.6), 12, 0.35, 0, 0);
+}
+
+.btn-scan:pressed {
+    -fx-background-color: #000a00;
+}
+
+/* ---------------- Bouton EXECUTER ---------------- */
+
+.btn-feu {
+    -fx-background-color: #000000;
+    -fx-text-fill: #00ff41;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-border-color: #00cc33;
+    -fx-border-width: 2;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-padding: 13 22 13 22;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 0.55), 16, 0.4, 0, 0);
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+.btn-feu:hover {
+    -fx-background-color: #001a00;
+    -fx-border-color: #00ff41;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 1.0), 28, 0.65, 0, 0);
+}
+
+.btn-feu:pressed {
+    -fx-background-color: #000500;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 0.3), 6, 0.15, 0, 0);
+}
+
+.button:disabled {
+    -fx-opacity: 0.3;
+}
+
+/* ---------------- Barre de statut ---------------- */
+
+.statut {
+    -fx-background-color: #000000;
+    -fx-text-fill: #004400;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-border-color: #003300;
+    -fx-border-width: 1;
+    -fx-padding: 8 12 8 12;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+}
+
+.statut-info {
+    -fx-text-fill: #ffcc00;
+    -fx-border-color: #886600;
+    -fx-effect: dropshadow(gaussian, rgba(255, 200, 0, 0.3), 6, 0.2, 0, 0);
+}
+
+.statut-ok {
+    -fx-text-fill: #00ff41;
+    -fx-border-color: #00aa22;
+    -fx-effect: dropshadow(gaussian, rgba(0, 255, 65, 0.55), 10, 0.3, 0, 0);
+}
+
+.statut-erreur {
+    -fx-text-fill: #ff3333;
+    -fx-border-color: #880000;
+    -fx-effect: dropshadow(gaussian, rgba(255, 50, 50, 0.55), 10, 0.3, 0, 0);
+}
