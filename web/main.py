@@ -65,13 +65,13 @@ def get_robot_mission(id: str):
 
 #route pour ajouter un robot
 @app.post("/api/add_robot", tags=["Robots"])
-def add_robot(name: str | None = Form(None), speed: int | None = Form(None),position_x: int | None = Form(None), position_y: int | None = Form(None)):
-    return db.add_robot(name,"en cours", speed, position_x, position_y)
+def add_robot(name: str | None = Form(None), speed: float | None = Form(None),position_x: float | None = Form(None), position_y: int | None = Form(None)):
+    return db.add_robot(name,"Available", speed, position_x, position_y)
 
 #route pour modifier un robot en fonction de l'id
 @app.put("/api/update_robot/{id}", tags=["Robots"])
 def update_robot(id: str, name: str | None = None, state: str | None = None, speed: int | None = None, 
-                position_x: int | None = None, position_y: int | None = None):
+                position_x: float | None = None, position_y: float | None = None):
     return db.update_robot(id, name, state, speed, position_x, position_y)
 
 #-----------------------------------------------------------------------------------
@@ -91,11 +91,11 @@ def list_missions():
 
 #route pour ajouter une mission 
 @app.post("/api/add_mission", tags=["Missions"])
-def add_mission(name : str | None = None, semaphore_id : str| None = None , robot_id : str | None = None, shape_id: str | None = None , team_id : str | None = None ,state : str ="En attente",
+def add_mission(name : str | None = None, semaphore_id : str| None = None , robot_id : str | None = None, shape_id: str | None = None , team_id : str | None = None ,state : str ="Awaiting",
                 start_date : str ="", end_date : str = "",team : str ="", time : int = ""):    
     return db.ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time)
  
- #route pour modifier une mission en fonction de l'id
+#route pour modifier une mission en fonction de l'id
 @app.put("/api/update_mission/{id}", tags=["Missions"])
 def update_mission(id: str, name: str | None = None, semaphore_id: str | None = None,
                          robot_id: str | None = None, shape_id: str | None = None,
@@ -154,27 +154,36 @@ def update_shape (id: str, name: str | None = None, image: str | None = None):
 
 #------------------------------ Routes configuration ---------------------------------
 
-#route pour afficher la configuration 
+#route pour afficher la configuration des grilles 
 @app.get("/api/get_config", tags = ["Configuration"])
 def get_config():
     return db.get_config()
 
-#route pour ajouter une configuration  
-@app.post("/api/add_config", tags = ["Configuration"])
-def add_config(grille : str ,nbr_semaphore : int ,nbr_robot : int):
-    return db.add_config(grille,nbr_semaphore,nbr_robot)
+# route pour ajouter une configuration de grille 
+@app.post("/api/add_config", tags=["Configuration"])
+def add_config(grille: str = Form(...), nbr_semaphore: int = Form(...), nbr_robot: int = Form(...), 
+            nb_x: float = Form(...), nb_y: float = Form(...)):
+    return db.add_config(grille, nbr_semaphore, nbr_robot, nb_x, nb_y)
 
-#route pour modifier la configuration 
-@app.put("/api/update_config", tags = ["Configuration"])
-def put_config(grille : str | None = None,nbr_semaphore : int| None = None ,nbr_robot : int| None = None):
-    return db.update_config(grille,nbr_semaphore,nbr_robot)
+# Route pour créer une grille et ses segments
+@app.post("/api/creer_grille", tags=["Configuration"])
+def creer_grille(name: str = Form(...)):
+    return db.faire_grille(name)
+
+#route pour afficher les segments 
+@app.get("/api/list_segment", tags=["Configuration"])
+def recup_segments():
+    return db.afficher_seg()
 
 #-----------------------------------------------------------------------------------
 
 #------------------------------ Route Healthcheck ---------------------------------
 #route pour vérifier la connexion 
-@app.get("/api/health")
+@app.get("/api/health", tags=["Health"])
 def healthcheck():
     return db.healthcheck()
 
 #-----------------------------------------------------------------------------------
+
+
+

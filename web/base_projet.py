@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 
+#création des tables 
 def table():
     try:
         conn = sqlite3.connect("Massilia.db")
@@ -11,8 +12,8 @@ def table():
                         name TEXT,
                         state TEXT,
                         speed INTEGER NOT NULL DEFAULT 1,
-                        position_x INTEGER NOT NULL DEFAULT 0,
-                        position_y INTEGER NOT NULL DEFAULT 0 
+                        position_x REAL NOT NULL DEFAULT 0,
+                        position_y REAL NOT NULL DEFAULT 0 
                 )''')
         
         c.execute('''CREATE TABLE IF NOT EXISTS SEMAPHORES (
@@ -60,7 +61,18 @@ def table():
             id             INTEGER PRIMARY KEY CHECK (id = 1),
             grille         TEXT NOT NULL,
             nbr_semaphore  INTEGER NOT NULL,
-            nbr_robot      INTEGER NOT NULL
+            nbr_robot      INTEGER NOT NULL,
+            nombre_x       INTEGER NOT NULL, 
+            nombre_y       INTEGER NOT NULL
+        )''')
+
+        c.execute('''CREATE TABLE IF NOT EXISTS SEGMENT (
+                  id TEXT PRIMARY KEY,
+                  coord_a_x  INTEGER NOT NULL,
+                  coord_a_y  INTEGER NOT NULL,
+                  coord_b_x  INTEGER NOT NULL,
+                  coord_b_y  INTEGER NOT NULL,
+                  UNIQUE (coord_a_x, coord_a_y, coord_b_x, coord_b_y)
         )''')
 
         conn.commit()
@@ -71,9 +83,9 @@ def table():
         conn.close()
 
 
-
-
 #table()
+
+
 
 
 

@@ -338,6 +338,22 @@ def modifier_mission(id, name, semaphore_id, robot_id, shape_id, state, start_da
         return "Erreur lors de la modification de la mission", e  
     finally:
         conn.close()
+
+#fonction qui permet de supprimer la table Missions
+def delete_missions_table():
+    conn = sqlite3.connect("Massilia.db")
+    c = conn.cursor()
+    try:
+        c.execute('''DROP TABLE IF EXISTS MISSIONS''')
+        conn.commit()
+        print("Table MISSIONS supprimée avec succès")
+        return "Table MISSIONS supprimée avec succès"
+    except Error as e:
+        print("Error:", e)
+        return "Erreur lors de la suppression de la table MISSIONS", e
+    finally:
+        conn.close()
+
 #---------------------------------------------------------------------------------
 
 #------------------------------ Fonctions des Formes ---------------------------------
@@ -436,45 +452,89 @@ def get_config():
         conn.close()
 
 #fonction qui permet d'ajouter une configuration
-def add_config(grille,nbr_semaphore,nbr_robot):
+def add_config(grille,nbr_semaphore,nbr_robot,nb_x,nb_y):
     conn = sqlite3.connect("Massilia.db")
-    config_id = 1
-    print(config_id,grille,nbr_semaphore,nbr_robot)
+    print(grille,nbr_semaphore,nbr_robot,nb_x,nb_y)
     try :
         c = conn.cursor()
-        c.execute('''INSERT INTO CONFIG (id, grille,nbr_semaphore,nbr_robot) VALUES (?, ?, ?,?)''',
-              (config_id,grille,nbr_semaphore,nbr_robot))
+        c.execute('''REPLACE INTO CONFIG (id,grille,nbr_semaphore,nbr_robot,nombre_x,nombre_y) VALUES (1,?, ?,?,?,?)''',
+              (grille,nbr_semaphore,nbr_robot,nb_x,nb_y))
     except Error as e:
-        print("Error:",e)
+        print("Erreur:",e)
         return "Erreur lors de l'ajout de la config", e 
     conn.commit()
     conn.close()
     return "Config ajoutée avec succès"
 
-#fonction qui permet de modifier la configuration en fonction de l'id 
-def update_config(grille,nbr_semaphore,nbr_robot):
+#fonction qui permet de créer la grille avec les segments 
+def faire_grille(name):
     conn = sqlite3.connect("Massilia.db")
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
     
-    champs = []
-    valeurs = []
-    
-    if grille is not None: champs.append("grille = ?"); valeurs.append(grille)
-    if nbr_semaphore is not None: champs.append("nbr_semaphore = ?"); valeurs.append(nbr_semaphore)
-    if nbr_robot is not None : champs.append("nbr_robot = ?"); valeurs.append(nbr_robot)
-    
-    if not champs:
-        conn.close()
-        
     try:
-        c.execute(f'''UPDATE CONFIG SET {', '.join(champs)} WHERE id = 1''', valeurs)
+        #Récupérer la configuration
+        c.execute('''SELECT * FROM CONFIG WHERE id = 1''')
+        row = c.fetchone()
+        
+        if not row:
+            return "Aucune configuration trouvée."
+            
+        config = dict(row)
+        nombre_x = int(config["nombre_x"])
+        nombre_y = int(config["nombre_y"])
+        
+        c.execute("UPDATE CONFIG SET grille = ? WHERE id = 1", (name,))
+        c.execute("DELETE FROM SEGMENT")
+        
+        # Nouvelles limites 
+        offset_x = nombre_x // 2 
+        x_min = -offset_x                    
+        x_max = nombre_x - offset_x - 1        
+        
+        y_min = 1                              
+        y_max = nombre_y                      
+        
+        segments = []
+        
+        segments.append((str(uuid.uuid4()), 0, 0, 0, y_min))
+        
+        #  Créer les segments de la grille 
+        for y in range(y_min, y_max + 1):
+            for x in range(x_min, x_max + 1):
+                if x < x_max:
+                    segments.append((str(uuid.uuid4()), x, y, x + 1, y))
+                if y < y_max:
+                    segments.append((str(uuid.uuid4()), x, y, x, y + 1))
+                    
+        #Insertion des segments dans la table SEGMENT
+        if segments:
+            c.executemany(
+                "INSERT INTO SEGMENT (id, coord_a_x, coord_a_y, coord_b_x, coord_b_y) VALUES (?, ?, ?, ?, ?)",
+                segments)
         conn.commit()
-        return "Config modifiée avec succès"
-    except Error as e:
-        return "Erreur lors de la modification de la configuration :",e   
+        return "Segment ajouté" 
+    except Exception as e:
+        print("Erreur :", e)
+        return "Erreur :",e
     finally:
         conn.close()
 
+#Fonction qui permet d'afficher les segments 
+def afficher_seg():
+    conn = sqlite3.connect("Massilia")
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    try :
+        c.execute('''SELECT * FROM SEGMENT''')
+        afficher_segment = [dict(row) for row in c.fetchall()]
+        return afficher_segment
+    except Error as e:
+        print("Erreur :",e)
+        return "Erreur de l'affichage des segments", e
+    finally:
+        conn.commit()
+        conn.close()
 
 #------------------------------ Fonction Healthcheck ---------------------------------
 
@@ -489,3 +549,4 @@ def healthcheck():
         return "Erreur de connexion :",e
     finally:
         conn.close()
+
