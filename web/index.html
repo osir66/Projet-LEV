@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration Massilia</title>
+    <link rel="stylesheet" href="/front/style.css">
+    <script src="/front/script.js" defer></script>
+</head>
+<body>
+
+    <iframe name="hiddenFrame" style="display:none;" onload="if(this.submitted) afficherSucces(); this.submitted=false;"></iframe>
+
+    <h1 style="text-align: center;">Projet Massilia</h1>
+    
+    <div id="notification">Ajouté avec succès à la base de données </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Ajouter un Robot</h2>
+            <form id="form-robot" action="/api/add_robot" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
+                <div class="form-group"><label>Nom :</label><input type="text" name="name" required></div>
+                <div class="form-group"><label>Vitesse :</label><input type="number" name="speed" value="1" required></div>
+                <div class="form-group"><label>Position X :</label><input type="number" name="position_x" value="0" required></div>
+                <div class="form-group"><label>Position Y :</label><input type="number" name="position_y" value="0" required></div>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Ajouter un Sémaphore</h2>
+            <form id="form-semaphore" action="/api/add_semaphore" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
+                <div class="form-group"><label>Nom :</label><input type="text" name="name" required></div>
+                <div class="form-group"><label>Durée :</label><input type="number" name="duration" required></div>
+                
+                <div class="form-group">
+                    <label>Type :</label>
+                    <select name="type" required>
+                        <option value="" disabled selected>Sélectionnez un type</option>
+                        <option value="Helice">Helice</option>
+                        <option value="Table">Table</option>
+                        <option value="Symbole">Symbole</option>
+                    </select>
+                </div>
+                
+                <div class="form-group"><label>Coordonnée X :</label><input type="number" name="coord_x" required></div>
+                <div class="form-group"><label>Coordonnée Y :</label><input type="number" name="coord_y" required></div>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Ajouter une Forme</h2>
+            <form id="form-shape" action="/api/add_shape" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
+                <div class="form-group"><label>Nom :</label><input type="text" name="name" required></div>
+                <div class="form-group"><label>Image :</label><input type="text" name="image" required></div>
+                <button type="submit">Ajouter</button>
+            </form>
+        </div>
+        <div class="card">
+            <h2>Ajouter une Configuration</h2>
+        <form id="form-config" action="/api/add_config" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
+            <div class="form-group"><label>Grille :</label><input type="text" name="grille" required></div>
+            <div class="form-group"><label>Nb Sémaphores :</label><input type="number" name="nbr_semaphore" required></div>
+            <div class="form-group"><label>Nb Robots :</label><input type="number" name="nbr_robot" required></div>
+            <div class="form-group"><label>Nombre X :</label><input type="number" name="nb_x" required></div>
+            <div class="form-group"><label>Nombre Y :</label><input type="number" name="nb_y" required></div>
+            <button type="submit">Ajouter</button>
+        </form>
+        </div>
+    </div>
+</body>
+</html>

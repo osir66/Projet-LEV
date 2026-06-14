@@ -23,11 +23,13 @@ public class Robot implements Runnable {
         this.retourBase = false;
     }
 
-    public String getNom() { return nom; }
-    public int getX() { return this.x; }
-    public int getY() { return this.y; }
-    public Missions getMissionActuelle() { return this.missionActuelle; }
-    public void setIdServeur(String idServeur) { this.id = idServeur; }
+    public String getNom() {
+    return nom;
+}
+
+    public void setIdServeur(String idServeur) {
+        this.id = idServeur;
+    }
 
     @Override
     public void run() {
@@ -42,120 +44,131 @@ public class Robot implements Runnable {
                 if (missionActuelle == null && !retourBase) {
                     notifierPosition("Available");
                     verifierNouvelleMission();
-                } else if (missionActuelle != null) {
-                    avancerVersCible();
+                } else if (missionActuelle != null && !retourBase) {
+                    // déplacement
+                    seDeplacerVers(missionActuelle.getCibleX(), missionActuelle.getCibleY());
+                    notifierPosition("Pending");
+
+                    if (x == missionActuelle.getCibleX() && y == missionActuelle.getCibleY()) {
+                        allumerSemaphore();
+                        
+                        String dateFin = Instant.now().toString(); 
+                        terminerMission(dateFin);
+                        
+                        carte.libererMission(missionActuelle.getIdMission());
+
+                        retourBase = true;
+                    }
                 } else if (retourBase) {
-                    // Retour à la base
-                    int bx = carte.getBaseX();
-                    int by = carte.getBaseY();
-                    if (this.x < bx) this.x++;
-                    else if (this.x > bx) this.x--;
-                    else if (this.y < by) this.y++;
-                    else if (this.y > by) this.y--;
+                    // retour base
+                    seDeplacerVers(carte.getBaseX(), carte.getBaseY());
+                    notifierPosition("Returning To Base");
 
-                    notifierPosition("Returning");
-
-                    if (this.x == bx && this.y == by) {
+                    if (x == carte.getBaseX() && y == carte.getBaseY()) {
+                        System.out.println("Robot " + nom + " est rentré à la base.");
+                        missionActuelle = null;
                         retourBase = false;
-                        System.out.println(String.format("[%s] De retour à la base et disponible.", this.nom));
+                        notifierPosition("Available");
                     }
                 }
-                Thread.sleep(100); // 10 pas/seconde
+                Thread.sleep(1000); // 1 pas/seconde
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
             } catch (Exception e) {
-                System.err.println("Erreur boucle robot (" + nom + ") : " + e.getMessage());
+                System.err.println("Erreur boucle (Robot " + nom + ") : " + e.getMessage());
             }
         }
+    }
+
+    private void seDeplacerVers(int cibleX, int cibleY) {
+        if (x < cibleX) x++;
+        else if (x > cibleX) x--;
+        if (y < cibleY) y++;
+        else if (y > cibleY) y--;
     }
 
     private void verifierNouvelleMission() {
         try {
-            String reponseMissions = this.webClient.requeteGet("/api/list_missions");
-            java.util.List<Missions> listeMissionsDuServeur = parserToutesMissions(reponseMissions);
+            String url = "/api/list_missions";
+            String reponse = webClient.requeteGet(url);
             
-            for (Missions m : listeMissionsDuServeur) {
-                if (m.getStatut() != null && m.getStatut().equalsIgnoreCase("Awaiting")) {
-                    
-                    if (this.carte.reserverMission(m.getIdMission())) {
-                        this.missionActuelle = m;
-                        this.missionActuelle.setDateDebut(Instant.now().toString());
+            if (reponse != null && !reponse.trim().isEmpty() && !reponse.trim().equals("[]") && !reponse.contains("detail")) {
+                
+                java.util.List<Missions> missionsDisponibles = parserToutesMissions(reponse);
+                
+                for (Missions missionPotentielle : missionsDisponibles) {
+                    if (missionPotentielle != null && missionPotentielle.getIdMission() != null && !missionPotentielle.getIdMission().isEmpty()) {
                         
-                        System.out.println(String.format("[%s] Mission %s acceptée. Cible: (%d, %d)", 
-                                this.nom, m.getIdMission(), m.getCibleX(), m.getCibleY()));
-                        
-                        changerEtatMission(this.missionActuelle, "Pending_robot", "");
-                        break;
+                        if (carte.reserverMission(missionPotentielle.getIdMission())) {
+                            missionPotentielle.setDateDebut(Instant.now().toString());
+                            this.missionActuelle = missionPotentielle;
+                            System.out.println("Robot " + nom + " a intercepté la mission ID: " + missionActuelle.getIdMission());
+                            
+                            String urlUpdate = String.format("/api/update_semaphore/%s?state=Pending", missionActuelle.getIdSemaphore());
+                            webClient.requetePut(urlUpdate, ""); 
+                            
+                            break;
+                        }
                     }
                 }
             }
         } catch (Exception e) {
-            System.err.println("Erreur lors de la vérification des missions (" + this.nom + ") : " + e.getMessage());
-        }
-    }
-
-    private void avancerVersCible() throws Exception {
-        if (this.missionActuelle == null) return;
-
-        int cx = this.missionActuelle.getCibleX();
-        int cy = this.missionActuelle.getCibleY();
-
-        if (this.x < cx) this.x++;
-        else if (this.x > cx) this.x--;
-        else if (this.y < cy) this.y++;
-        else if (this.y > cy) this.y--;
-
-        notifierPosition("Occupied");
-
-        if (this.x == cx && this.y == cy) {
-            System.out.println(String.format("[%s] Mission %s complétée !", this.nom, this.missionActuelle.getIdMission()));
-            
-            allumerSemaphore();
-            
-            String dateFin = Instant.now().toString();
-            changerEtatMission(this.missionActuelle, "Pending_semaphore", dateFin);
-            
-            this.carte.libererMission(this.missionActuelle.getIdMission());
-            this.missionActuelle = null;
-            this.retourBase = true;
+            System.err.println("Erreur vérification mission (" + nom + ") : " + e.getMessage());
         }
     }
 
     private void notifierPosition(String etat) throws Exception {
         String url = String.format("/api/update_robot/%s?state=%s&position_x=%d&position_y=%d",
                 id, URLEncoder.encode(etat, StandardCharsets.UTF_8), x, y);
-        this.webClient.requetePut(url, ""); 
+        
+        webClient.requetePut(url, ""); 
+        System.out.println("Robot " + nom + " (ID Serveur: " + id + ") [" + etat + "] position : (" + x + ", " + y + ")");
     }
 
-    private void allumerSemaphore() {
+    private void allumerSemaphore() throws Exception {
+        System.out.println("Robot " + nom + " active le sémaphore " + missionActuelle.getIdSemaphore());
+        String url = String.format("/api/update_semaphore/%s?state=Pending",
+                missionActuelle.getIdSemaphore());
+        webClient.requetePut(url, ""); 
+    }
+    
+    private void terminerMission(String dateFin) throws Exception {
+        String dateDebutEncodee = URLEncoder.encode(missionActuelle.getDateDebut(), StandardCharsets.UTF_8);
+        String dateFinEncodee = URLEncoder.encode(dateFin, StandardCharsets.UTF_8);
+        
+        String url = String.format("/api/update_mission/%s?state=%s&robot_id=%s&start_date=%s&end_date=%s",
+                missionActuelle.getIdMission(), 
+                URLEncoder.encode("Pending", StandardCharsets.UTF_8),
+                URLEncoder.encode(this.id, StandardCharsets.UTF_8),
+                dateDebutEncodee,
+                dateFinEncodee);
+                
+        webClient.requetePut(url, ""); 
+        System.out.println("Mission " + missionActuelle.getIdMission() + " validée par " + nom + " (Début: " + missionActuelle.getDateDebut() + " | Fin: " + dateFin + ")");
+    }
+
+    private Missions parseJsonMission(String json) {
         try {
-            if (missionActuelle != null) {
-                String url = String.format("/api/update_semaphore/%s?state=On&coord_x=%d&coord_y=%d", 
-                    missionActuelle.getIdSemaphore(),
-                    missionActuelle.getCibleX(),
-                    missionActuelle.getCibleY()
-                );
-                this.webClient.requetePut(url, "");
-                System.out.println("-> Robot " + nom + " a activé le sémaphore " + missionActuelle.getIdSemaphore());
+            String idMission = extractValue(json, "id");
+            if (idMission.isEmpty()) idMission = extractValue(json, "idMission");
+            
+            String idSemaphore = extractValue(json, "semaphore_id");
+            String symbole = extractValue(json, "shapes_id");
+            
+            int cibleX = Math.abs(idSemaphore.hashCode() % 15) + 2; 
+            int cibleY = Math.abs(idSemaphore.hashCode() % 15) + 2;
+
+            if (idMission.isEmpty() || idSemaphore.isEmpty()) {
+                return null;
             }
+            return new Missions(idMission, idSemaphore, symbole, cibleX, cibleY, "8000");
         } catch (Exception e) {
-            System.err.println("Erreur activation sémaphore (" + nom + ") : " + e.getMessage());
+            return null; 
         }
     }
 
-    private void changerEtatMission(Missions m, String etat, String dateFin) throws Exception {
-        String dDebut = m.getDateDebut() != null ? m.getDateDebut() : Instant.now().toString();
-        String dFin = dateFin != null ? dateFin : "";
-        
-        String url = String.format("/api/update_mission/%s?state=%s&robot_id=%s&start_date=%s&end_date=%s",
-                m.getIdMission(), 
-                URLEncoder.encode(etat, StandardCharsets.UTF_8),
-                URLEncoder.encode(this.id, StandardCharsets.UTF_8),
-                URLEncoder.encode(dDebut, StandardCharsets.UTF_8),
-                URLEncoder.encode(dFin, StandardCharsets.UTF_8));
-                
-        this.webClient.requetePut(url, ""); 
-    }
-
-    private String extraireValeur(String json, String key) {
+    private String extractValue(String json, String key) {
         int keyIndex = json.indexOf("\"" + key + "\"");
         if (keyIndex == -1) return "";
         
@@ -185,29 +198,18 @@ public class Robot implements Runnable {
         java.util.List<Missions> liste = new java.util.ArrayList<>();
 
         String cleanJson = jsonTableau.trim();
-        if (cleanJson.startsWith("[")) cleanJson = cleanJson.substring(1);
-        if (cleanJson.endsWith("]")) cleanJson = cleanJson.substring(0, cleanJson.length() - 1);
+        if (cleanJson.startsWith("[")) 
+            cleanJson = cleanJson.substring(1);
+        if (cleanJson.endsWith("]")) 
+            cleanJson = cleanJson.substring(0, cleanJson.length() - 1);
 
         String jsonModifie = cleanJson.replace("},{", "}SPLIT{").replace("}, {", "}SPLIT{");
-        String[] blocs = jsonModifie.split("SPLIT");
         
+        String[] blocs = jsonModifie.split("SPLIT");
+
         for (String bloc : blocs) {
-            String idMission = extraireValeur(bloc, "id");
-            if (idMission.isEmpty()) idMission = extraireValeur(bloc, "idMission");
-            
-            String idSemaphore = extraireValeur(bloc, "semaphore_id");
-            String symbole = extraireValeur(bloc, "shapes_id");
-            
-            String status = extraireValeur(bloc, "state");
-            if (status.isEmpty()) status = extraireValeur(bloc, "status");
-            if (status.isEmpty()) status = extraireValeur(bloc, "statut");
-            
-            if (!idMission.isEmpty() && !idSemaphore.isEmpty()) {
-                int cx = Math.abs(idSemaphore.hashCode() % 15) + 2; 
-                int cy = Math.abs(idSemaphore.hashCode() % 15) + 2;
-                
-                Missions m = new Missions(idMission, idSemaphore, symbole, cx, cy);
-                m.setStatut(status.isEmpty() ? "Awaiting" : status);
+            Missions m = parseJsonMission(bloc);
+            if (m != null) {
                 liste.add(m);
             }
         }

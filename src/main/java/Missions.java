@@ -5,17 +5,16 @@ public class Missions {
     private boolean termine;
     private int cibleX, cibleY;
     private String dateDebut;
-    
-    private String statut; 
+    private String port;
 
-    public Missions(String idMission, String idSemaphore, String symbole, int cibleX, int cibleY) {
+    public Missions(String idMission, String idSemaphore, String symbole, int cibleX, int cibleY, String port) {
         this.idMission = idMission;
         this.idSemaphore = idSemaphore;
         this.symbole = symbole;
         this.cibleX = cibleX;
         this.cibleY = cibleY;
         this.termine = false;
-        this.statut = "Awaiting";
+        this.port = port;
     }
 
     public String getIdMission() {
@@ -54,11 +53,11 @@ public class Missions {
         this.termine = termine; 
     }
 
-    public String getStatut() {
-        return this.statut;
+    public String getPort() {
+        return port;
     }
 
-    public void setStatut(String statut) {
-        this.statut = statut;
+    public void setPort(String port) {
+        this.port = port;
     }
 }
