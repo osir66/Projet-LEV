@@ -5,6 +5,8 @@ public class Missions {
     private boolean termine;
     private int cibleX, cibleY;
     private String dateDebut;
+    
+    private String statut; 
 
     public Missions(String idMission, String idSemaphore, String symbole, int cibleX, int cibleY) {
         this.idMission = idMission;
@@ -13,6 +15,7 @@ public class Missions {
         this.cibleX = cibleX;
         this.cibleY = cibleY;
         this.termine = false;
+        this.statut = "Awaiting";
     }
 
     public String getIdMission() {
@@ -49,5 +52,13 @@ public class Missions {
 
     public void setTermine(boolean termine) { 
         this.termine = termine; 
+    }
+
+    public String getStatut() {
+        return this.statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
     }
 }
