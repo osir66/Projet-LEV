@@ -1,0 +1,35 @@
+/* =====================================================
+style.css — feuille de styles vide
+Sélecteurs JavaFX utiles pour styliser l'interface :
+.root → conteneur racine (fond, police globale)
+.label → tous les Label
+.text-field → tous les TextField
+.button → tous les Button
+.combo-box → tous les ComboBox
+.combo-box-popup .list-view .list-cell → options du menu
+.check-box → cases à cocher
+.spinner → Spinner
+Propriétés courantes :
+-fx-background-color, -fx-text-fill, -fx-font-size,
+-fx-font-family, -fx-border-color, -fx-border-width,
+-fx-padding, -fx-background-radius, -fx-border-radius,
+-fx-effect: dropshadow(gaussian, couleur, rayon, spread, dx, dy)
+===================================================== */
+
+.label.nom_controller {
+    -fx-alignment: center;
+    -fx-font-size: 250%;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+    -fx-align-content: center;
+    -fx-max-width: infinity;
+}
+
+.label {
+    -fx-font-size: 125%;
+    -fx-text-fill: #555;
+}
+
+.barre_recherche {
+    -fx-maringintop: 10px;
+}

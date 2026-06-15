@@ -9,17 +9,29 @@
 </head>
 <body>
 
+    <aside class="sidebar">
+        <div class="sidebar-title">Menu</div>
+        <nav>
+            <ul>
+                <li><a href="/">Stat</a></li>
+                <li><a href="/commande" class="active">Commande</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="page-content">
+
     <iframe name="hiddenFrame" style="display:none;" onload="if(this.submitted) afficherSucces(); this.submitted=false;"></iframe>
 
-    <h1 style="text-align: center;">Projet Massilia</h1>
-    
+    <h1 style="text-align: center; margin-bottom: 50px;">Tableau de bord Massilia</h1>
+
     <div id="notification">Ajouté avec succès à la base de données </div>
-    
+
     <div class="container">
         <div class="card">
             <h2>Ajouter un Robot</h2>
             <form id="form-robot" action="/api/add_robot" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
-                <div class="form-group"><label>Nom :</label><input type="text" name="name" required></div>
+                <div class="form-group" style="margin-top: 20px;"><label>Nom :</label><input type="text" name="name" required></div>
                 <div class="form-group"><label>Vitesse :</label><input type="number" name="speed" value="1" required></div>
                 <div class="form-group"><label>Position X :</label><input type="number" name="position_x" value="0" required></div>
                 <div class="form-group"><label>Position Y :</label><input type="number" name="position_y" value="0" required></div>
@@ -30,9 +42,7 @@
         <div class="card">
             <h2>Ajouter un Sémaphore</h2>
             <form id="form-semaphore" action="/api/add_semaphore" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
-                <div class="form-group"><label>Nom :</label><input type="text" name="name" required></div>
-                <div class="form-group"><label>Durée :</label><input type="number" name="duration" required></div>
-                
+                <div class="form-group" style="margin-top: 20px;"><label>Nom :</label><input type="text" name="name" required></div>                
                 <div class="form-group">
                     <label>Type :</label>
                     <select name="type" required>
@@ -43,7 +53,7 @@
                     </select>
                 </div>
                 
-                <div class="form-group"><label>Coordonnée X :</label><input type="number" name="coord_x" required></div>
+                <div class="form-group" style="margin-top: 20px;"><label>Coordonnée X :</label><input type="number" name="coord_x" required></div>
                 <div class="form-group"><label>Coordonnée Y :</label><input type="number" name="coord_y" required></div>
                 <button type="submit">Ajouter</button>
             </form>
@@ -52,7 +62,7 @@
         <div class="card">
             <h2>Ajouter une Forme</h2>
             <form id="form-shape" action="/api/add_shape" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
-                <div class="form-group"><label>Nom :</label><input type="text" name="name" required></div>
+                <div class="form-group" style="margin-top: 20px;"><label>Nom :</label><input type="text" name="name" required></div>
                 <div class="form-group"><label>Image :</label><input type="text" name="image" required></div>
                 <button type="submit">Ajouter</button>
             </form>
@@ -60,7 +70,7 @@
         <div class="card">
             <h2>Ajouter une Configuration</h2>
         <form id="form-config" action="/api/add_config" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
-            <div class="form-group"><label>Grille :</label><input type="text" name="grille" required></div>
+            <div class="form-group" style="margin-top: 20px;"><label>Grille :</label><input type="text" name="grille" required></div>
             <div class="form-group"><label>Nb Sémaphores :</label><input type="number" name="nbr_semaphore" required></div>
             <div class="form-group"><label>Nb Robots :</label><input type="number" name="nbr_robot" required></div>
             <div class="form-group"><label>Nombre X :</label><input type="number" name="nb_x" required></div>
@@ -69,5 +79,7 @@
         </form>
         </div>
     </div>
+
+    </div><!-- fin .page-content -->
 </body>
 </html>
