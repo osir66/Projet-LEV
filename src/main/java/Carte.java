@@ -1,13 +1,14 @@
-// voir pour utiliser une matrice à la place d'une carte et des coordonnées
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Carte {
     private List<Robot> listeRobots;
     private Set<String> missionsEnCours;
+    private Map<String, int[]> positionsSemaphores; 
 
     private String nomGrille = "Defaut";
     private int largeurX = 15;
@@ -19,6 +20,25 @@ public class Carte {
     public Carte() {
         this.listeRobots = new ArrayList<>();
         this.missionsEnCours = new HashSet<>();
+        this.positionsSemaphores = new HashMap<>();
+    }
+
+    public synchronized void ajouterPositionSemaphore(String id, int x, int y) {
+        positionsSemaphores.put(id, new int[]{x, y});
+    }
+
+    public synchronized int getSemaphoreX(String id, int valeurParDefaut) {
+        if (positionsSemaphores.containsKey(id)) {
+            return positionsSemaphores.get(id)[0];
+        }
+        return valeurParDefaut;
+    }
+
+    public synchronized int getSemaphoreY(String id, int valeurParDefaut) {
+        if (positionsSemaphores.containsKey(id)) {
+            return positionsSemaphores.get(id)[1];
+        }
+        return valeurParDefaut;
     }
 
     public void setConfiguration(String nom, int x, int y) {
@@ -27,29 +47,29 @@ public class Carte {
         this.hauteurY = y;
     }
 
-    public int getLargeurX() {
-        return largeurX;
+    public int getLargeurX() { 
+        return largeurX; 
     }
 
-    public int getHauteurY() {
-        return hauteurY;
+    public int getHauteurY() { 
+        return hauteurY; 
     }
 
-    public String getNomGrille() {
-        return nomGrille;
+    public String getNomGrille() { 
+        return nomGrille; 
     }
 
-    public synchronized void ajouterRobot(Robot r) {
-        listeRobots.add(r);
+    public synchronized void ajouterRobot(Robot r) { 
+        listeRobots.add(r); 
     }
 
-    public synchronized List<Robot> getRobots() {
-        return listeRobots;
+    public synchronized List<Robot> getRobots() { 
+        return listeRobots; 
     }
 
     public synchronized boolean reserverMission(String idMission) {
         if (missionsEnCours.contains(idMission)) {
-            return false; // mission déjà prise
+            return false;
         }
         missionsEnCours.add(idMission);
         return true;
@@ -62,8 +82,8 @@ public class Carte {
     public int getBaseX() { 
         return baseX; 
     }
-    
-    public int getBaseY() {
+
+    public int getBaseY() { 
         return baseY; 
     }
 }

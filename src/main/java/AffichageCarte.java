@@ -4,71 +4,88 @@ import javafx.scene.paint.Color;
 
 public class AffichageCarte extends Canvas {
     private final Carte carte;
-    private static final int TAILLE_CASE = 40; 
+    private static final int TAILLE_CASE = 35; // Distance entre 2 routes (px)
 
     public AffichageCarte(Carte carte, double width, double height) {
         super(width, height);
         this.carte = carte;
     }
 
+    private double getPixelX(int gridX) {
+        double centerX = getWidth() / 2.0;
+        return centerX + (gridX * TAILLE_CASE);
+    }
+
+    private double getPixelY(int gridY) {
+        double centerY = getHeight() / 2.0;
+        return centerY + (gridY * TAILLE_CASE);
+    }
+
     public void dessiner() {
         GraphicsContext gc = this.getGraphicsContext2D();
-    
         gc.clearRect(0, 0, getWidth(), getHeight());
-    
-        int colonnes = carte.getLargeurX();
-        int lignes = carte.getHauteurY();
+
+        int demiX = carte.getLargeurX() / 2;
+        int demiY = carte.getHauteurY() / 2;
+
+        double coordMinX = getPixelX(-demiX);
+        double coordMaxX = getPixelX(demiX);
+        double coordMinY = getPixelY(-demiY);
+        double coordMaxY = getPixelY(demiY);
 
         gc.setStroke(Color.LIGHTGRAY);
-        gc.setLineWidth(0.5);
-    
-        for (int i = 0; i <= colonnes; i++) {
-            int x = i * TAILLE_CASE;
-            gc.strokeLine(x, 0, x, lignes * TAILLE_CASE);
-        }
-    
-        for (int j = 0; j <= lignes; j++) {
-            int y = j * TAILLE_CASE;
-            gc.strokeLine(0, y, colonnes * TAILLE_CASE, y);
+        gc.setLineWidth(1.5);
+
+        for (int i = -demiX; i <= demiX; i++) {
+            double posX = getPixelX(i);
+            gc.strokeLine(posX, coordMinY, posX, coordMaxY);
         }
 
-        int baseX = carte.getBaseX() * TAILLE_CASE;
-        int baseY = carte.getBaseY() * TAILLE_CASE;
+        for (int j = -demiY; j <= demiY; j++) {
+            double posY = getPixelY(j);
+            gc.strokeLine(coordMinX, posY, coordMaxX, posY);
+        }
+
+        double baseX = getPixelX(carte.getBaseX());
+        double baseY = getPixelY(carte.getBaseY());
+        
         gc.setFill(Color.DARKGREEN);
-        gc.fillRect(baseX, baseY, TAILLE_CASE, TAILLE_CASE);
+        gc.fillOval(baseX - 15, baseY - 15, 30, 30);
+        
+        
         gc.setFill(Color.WHITE);
-        gc.fillText("BASE", baseX + 5, baseY + 24);
+        gc.fillText("BASE", baseX - 14, baseY + 5);
 
         synchronized (carte) {
             for (Robot robot : carte.getRobots()) {
-                int rx = robot.getX() * TAILLE_CASE;
-                int ry = robot.getY() * TAILLE_CASE;
+                double rx = getPixelX(robot.getX());
+                double ry = getPixelY(robot.getY());
 
                 if (robot.getMissionActuelle() != null) {
                     Missions m = robot.getMissionActuelle();
-                    int cx = m.getCibleX() * TAILLE_CASE;
-                    int cy = m.getCibleY() * TAILLE_CASE;
+                    double cx = getPixelX(m.getCibleX());
+                    double cy = getPixelY(m.getCibleY());
 
                     gc.setStroke(Color.RED);
                     gc.setLineWidth(2);
-                    gc.strokeRect(cx + 2, cy + 2, TAILLE_CASE - 4, TAILLE_CASE - 4);
+                    gc.strokeRect(cx - 10, cy - 10, 20, 20);
                     gc.setFill(Color.RED);
-                    gc.fillText("Sém: " + m.getSymbole(), cx + 2, cy - 4);
+                    gc.fillText("Sém: " + m.getSymbole(), cx + 12, cy - 4);
 
-                    gc.setStroke(Color.rgb(255, 0, 0, 0.3));
+                    gc.setStroke(Color.rgb(255, 0, 0, 0.25));
                     gc.setLineWidth(1);
-                    gc.strokeLine(rx + (TAILLE_CASE / 2.0), ry + (TAILLE_CASE / 2.0), cx + (TAILLE_CASE / 2.0), cy + (TAILLE_CASE / 2.0));
+                    gc.strokeLine(rx, ry, cx, cy);
                 }
 
                 gc.setFill(Color.DODGERBLUE);
-                gc.fillOval(rx + 6, ry + 6, TAILLE_CASE - 12, TAILLE_CASE - 12);
+                gc.fillOval(rx - 8, ry - 8, 16, 16);
                 
                 gc.setStroke(Color.BLACK);
-                gc.setLineWidth(1.5);
-                gc.strokeOval(rx + 6, ry + 6, TAILLE_CASE - 12, TAILLE_CASE - 12);
-
+                gc.setLineWidth(1);
+                gc.strokeOval(rx - 8, ry - 8, 16, 16);
+                
                 gc.setFill(Color.BLACK);
-                gc.fillText(robot.getNom(), rx, ry - 4);
+                gc.fillText(robot.getNom(), rx + 12, ry + 5);
             }
         }
     }

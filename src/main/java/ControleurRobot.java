@@ -10,34 +10,38 @@ public class ControleurRobot extends BorderPane {
     private final ListView<String> listeConsoleStatut;
 
     public ControleurRobot(Carte carte) {
-        this.carte = carte;
+    this.carte = carte;
 
-        int largeurPixels = carte.getLargeurX() * 40;
-        int hauteurPixels = carte.getHauteurY() * 40;
+    int largeurPixels = carte.getLargeurX() * 40;
+    int hauteurPixels = carte.getHauteurY() * 40;
 
-        this.affichageCarte = new AffichageCarte(carte, largeurPixels, hauteurPixels);
-        this.setCenter(affichageCarte);
+    this.affichageCarte = new AffichageCarte(carte, largeurPixels, hauteurPixels);
+    this.setCenter(affichageCarte);
 
-        VBox panneauInfos = new VBox(10);
-        panneauInfos.setStyle("-fx-padding: 10; -fx-background-color: #f8f9fa; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 0 1;");
-        panneauInfos.setPrefWidth(240);
+    this.setPrefSize(largeurPixels + 240, hauteurPixels);
 
-        Label titrePanneau = new Label("Moniteur d'activité (Threads)");
-        titrePanneau.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
+    VBox panneauInfos = new VBox(10);
+    panneauInfos.setStyle("-fx-padding: 10; -fx-background-color: #f8f9fa; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 0 1;");
+    panneauInfos.setPrefWidth(240);
+    panneauInfos.setMinHeight(hauteurPixels); 
 
-        this.listeConsoleStatut = new ListView<>();
-        listeConsoleStatut.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 11px;");
-        
-        panneauInfos.getChildren().addAll(titrePanneau, listeConsoleStatut);
-        this.setRight(panneauInfos);
+    Label titrePanneau = new Label("Moniteur d'activité (Threads)");
+    titrePanneau.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
 
-        AnimationTimer boucleSimulation = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                rafraichirIHM();
-            }
-        };
-        boucleSimulation.start();
+    this.listeConsoleStatut = new ListView<>();
+    listeConsoleStatut.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 11px;");
+    listeConsoleStatut.setPrefHeight(hauteurPixels - 40); 
+
+    panneauInfos.getChildren().addAll(titrePanneau, listeConsoleStatut);
+    this.setRight(panneauInfos);
+
+    AnimationTimer boucleSimulation = new AnimationTimer() {
+        @Override
+        public void handle(long now) {
+            rafraichirIHM();
+        }
+    };
+    boucleSimulation.start();
     }
     
     private void rafraichirIHM() {
@@ -49,7 +53,7 @@ public class ControleurRobot extends BorderPane {
                 String logRobot = String.format("[%s] Pos: (%d,%d)", robot.getNom(), robot.getX(), robot.getY());
                 
                 if (robot.getMissionActuelle() != null) {
-                    logRobot += " -> Active: " + robot.getMissionActuelle().getSymbole();
+                    logRobot += " -> Cible: " + robot.getMissionActuelle().getSymbole();
                 } else {
                     logRobot += " -> En attente";
                 }

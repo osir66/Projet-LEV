@@ -57,7 +57,7 @@ public class Robot implements Runnable {
                                         System.out.println(String.format("[%s] Mission %s acceptée. Cible: (%d, %d)", 
                                                 this.nom, m.getIdMission(), m.getCibleX(), m.getCibleY()));
                                         
-                                        changerEtatMission(this.missionActuelle, "Pending_robot", "");
+                                        changerEtatMission(this.missionActuelle, "Pending_robot");
                                         
                                         break; 
                                     }
@@ -86,7 +86,7 @@ public class Robot implements Runnable {
                         System.out.println(String.format("[%s] De retour à la base et disponible.", this.nom));
                     }
                 }
-                Thread.sleep(100); // 10 pas/seconde
+                Thread.sleep(1000); // 1 pas/seconde
             } catch (Exception e) {
                 System.err.println("Erreur boucle robot (" + nom + ") : " + e.getMessage());
             }
@@ -108,7 +108,7 @@ public class Robot implements Runnable {
                         System.out.println(String.format("[%s] Mission %s acceptée. Cible: (%d, %d)", 
                                 this.nom, m.getIdMission(), m.getCibleX(), m.getCibleY()));
                         
-                        changerEtatMission(this.missionActuelle, "Pending_robot", "");
+                        changerEtatMission(this.missionActuelle, "Pending_robot");
                         break;
                     }
                 }
@@ -136,8 +136,7 @@ public class Robot implements Runnable {
             
             allumerSemaphore();
             
-            String dateFin = Instant.now().toString();
-            changerEtatMission(this.missionActuelle, "Pending_semaphore", dateFin);
+            changerEtatMission(this.missionActuelle, "Pending_semaphore");
             
             this.carte.libererMission(this.missionActuelle.getIdMission());
             this.missionActuelle = null;
@@ -167,16 +166,14 @@ public class Robot implements Runnable {
         }
     }
 
-    private void changerEtatMission(Missions m, String etat, String dateFin) throws Exception {
+    private void changerEtatMission(Missions m, String etat) throws Exception {
         String dDebut = m.getDateDebut() != null ? m.getDateDebut() : Instant.now().toString();
-        String dFin = dateFin != null ? dateFin : "";
         
-        String url = String.format("/api/update_mission/%s?state=%s&robot_id=%s&start_date=%s&end_date=%s",
+        String url = String.format("/api/update_mission/%s?state=%s&robot_id=%s&start_date=%s",
                 m.getIdMission(), 
                 URLEncoder.encode(etat, StandardCharsets.UTF_8),
                 URLEncoder.encode(this.id, StandardCharsets.UTF_8),
-                URLEncoder.encode(dDebut, StandardCharsets.UTF_8),
-                URLEncoder.encode(dFin, StandardCharsets.UTF_8));
+                URLEncoder.encode(dDebut, StandardCharsets.UTF_8));
                 
         this.webClient.requetePut(url, ""); 
     }
