@@ -16,15 +16,15 @@ app.mount("/front", StaticFiles(directory="front"), name="front")
 def page_html():
     return FileResponse("index.html")
 
-#@app.get("/mattieux", tags=["Interface"])
-#def mattieux_page():
-#   with open("airbus.html", "r", encoding="utf-8") as f:
-#        html = f.read()
-#    html = html.replace("__COUNT_ROBOTS__",     str(db.count_robots()))
-#    html = html.replace("__COUNT_SEMAPHORES__", str(db.count_semaphores()))
-#    html = html.replace("__COUNT_FORMES__",     str(db.count_formes()))
-#    html = html.replace("__COUNT_MISSIONS__",   str(db.count_missions()))
-#    return HTMLResponse(content=html)
+@app.get("/mattieux", tags=["Interface"])
+def mattieux_page():
+   with open("airbus.html", "r", encoding="utf-8") as f:
+    html = f.read()
+    html = html.replace("__COUNT_ROBOTS__",     str(db.count_robots()))
+    html = html.replace("__COUNT_SEMAPHORES__", str(db.count_semaphores()))
+    html = html.replace("__COUNT_FORMES__",     str(db.count_formes()))
+    html = html.replace("__COUNT_MISSIONS__",   str(db.count_missions()))
+    return HTMLResponse(content=html)
 
 #-----------------------------------------------------------------------------------
 
