@@ -3,9 +3,9 @@ import urllib.request
 import threading
 import time
 from datetime import datetime, timezone
-from interface import Interface
 from lettres import LETTRES
 from parseur import lire_json
+import interface
 
 # adresse du serveur a changer si lip change
 SERVEUR = "http://192.168.1.22:8000"
@@ -56,7 +56,7 @@ def traiter_mission(m, forme):
         put("/api/update_semaphore/" + m["semaphore_id"] + "?state=Occupied")
 
     # on affiche la forme
-    root.after(0, lambda f=forme, n=m["name"]: app.changer_lettre_auto(f, n))
+    root.after(0, interface.vider)
 
     # on attend la duree
     time.sleep(duree)
@@ -73,7 +73,7 @@ def traiter_mission(m, forme):
     missions_terminees.add(m["id"])
 
     # on vide laffichage
-    root.after(0, lambda: app.changer_lettre_auto(""))
+    root.after(0, lambda: interface.changer_lettre_auto(""))
 
     # on libere le verrou
     mission_active = None
@@ -108,10 +108,9 @@ def surveiller_serveur():
 
     threading.Timer(2, surveiller_serveur).start()
 
+# on cree la fenetre et on lance l interface
 root = ctk.CTk()
-root.geometry("700x620")
-root.resizable(True, True)
-app = Interface(root)
+interface.lancer(root)
 
 threading.Timer(0, surveiller_serveur).start()
 
