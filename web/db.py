@@ -2,6 +2,7 @@ import base_projet
 import sqlite3
 from sqlite3 import Error
 import uuid
+import urllib.request
 
 #------------------------------ Fonctions des Sémaphores ----------------------------------
 
@@ -535,6 +536,29 @@ def afficher_seg():
     finally:
         conn.commit()
         conn.close()
+
+#------------------------------ Fonctions de comptage (API externe) -------------------
+
+BASE_URL = "http://127.168.1.96"
+
+def _fetch_count(endpoint):
+    try:
+        with urllib.request.urlopen(f"{BASE_URL}{endpoint}", timeout=3) as r:
+            return r.read().decode().count('"id"')
+    except Exception:
+        return "?"
+
+def count_robots():
+    return _fetch_count("/api/list_robots")
+
+def count_semaphores():
+    return _fetch_count("/api/list_semaphore")
+
+def count_formes():
+    return _fetch_count("/api/list_shapes")
+
+def count_missions():
+    return _fetch_count("/api/list_missions")
 
 #------------------------------ Fonction Healthcheck ---------------------------------
 

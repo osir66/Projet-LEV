@@ -1,0 +1,450 @@
+h1 {
+    text-align: center;
+}
+.content_bienvenue {
+    text-align: center;
+    font-size: 150%;
+    margin-top: 5%;
+}
+.btn_troll {
+    text-align: left;
+    align-items: center;
+}
+
+@property --color {
+  syntax: '<color>';
+  initial-value: yellow;
+  inherits: false;
+}
+
+/**
+    Soleil qui tourne inspiré de https://uiverse.io/Ratinax/wonderful-dingo-30 
+ */
+.sun {
+  position: fixed;
+  top: -5em;
+  right: -5em;
+  animation: rotate 4s linear infinite;
+  --color: yellow;
+  --scale: 1;
+}
+
+.center {
+  position: relative;
+  height: calc(var(--scale) * 10em);
+  width: calc(var(--scale) * 10em);
+  transition: background-color 2s linear, box-shadow 2s linear;
+  background-color: var(--color);
+  border-radius: 50%;
+  box-shadow: 0 0 calc(var(--scale) * 3em) var(--color);
+}
+
+
+.ray {
+  position: absolute;
+  height: calc(var(--scale) * 3em);
+  width: calc(var(--scale) * 0.5em);
+  transition: background-color 2s ease-in-out, box-shadow 2s ease-in-out;
+  box-shadow: 0 0 calc(var(--scale) * 1em) var(--color);
+  background-color: var(--color);
+}
+
+.r-1 {
+  margin-left: calc(var(--scale) * 4.75em);
+  margin-top: calc(var(--scale) * 1em);
+}
+
+.r-2 {
+  margin-left: calc(var(--scale) * 12.25em);
+  margin-top: calc(var(--scale) * -6.25em);
+  transform: rotate(90deg);
+}
+
+.r-3 {
+  margin-left: calc(var(--scale) * 4.75em);
+  margin-top: calc(var(--scale) * -14em);
+}
+
+.r-4 {
+  margin-left: calc(var(--scale) * -2.75em);
+  margin-top: calc(var(--scale) * -6.25em);
+  transform: rotate(90deg);
+}
+
+.r-5 {
+  margin-left: calc(var(--scale) * -0.5em);
+  margin-top: calc(var(--scale) * -1em);
+  transform: rotate(45deg);
+}
+
+.r-6 {
+  margin-left: calc(var(--scale) * 9.75em);
+  margin-top: calc(var(--scale) * -1em);
+  transform: rotate(-45deg);
+}
+
+.r-7 {
+  margin-left: calc(var(--scale) * 10.25em);
+  margin-top: calc(var(--scale) * -11.75em);
+  transform: rotate(45deg);
+}
+
+.r-8 {
+  margin-left: calc(var(--scale) * -0.5em);
+  margin-top: calc(var(--scale) * -11.75em);
+  transform: rotate(-45deg);
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+    --color: yellow;
+  }
+
+  100% {
+    transform: rotate(360deg);
+    --color: orange;
+  }
+}
+/*  Soleil qui tourne inspiré de https://uiverse.io/Ratinax/wonderful-dingo-30 */
+
+
+/* --- Sécurité pour éviter les barres de défilement horizontales --- */
+body {
+    overflow-x: hidden;
+}
+
+/* --- Cache le checkbox secret --- */
+#plane-trigger {
+    display: none;
+}
+
+/* --- Style de base pour votre bouton secret --- */
+.button_secret {
+    position: fixed;
+    top: 3.5em;
+    right: 3.5em;
+    z-index: 10;
+    padding: 6px 12px;
+    background: none;
+    color: yellow;
+    border-radius: 5px;
+    font-size: 0.75em;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* --- Le design de l'avion (Pur CSS) --- */
+.plane {
+    position: fixed;
+    top: 28%;
+    left: 100%;
+
+    width: 220px;
+    height: 44px;
+    /* Nez arrondi à gauche (sens du vol), queue plate à droite */
+    background: linear-gradient(to bottom, #002e6d 68%, #d0d8e8 68%);
+    border-radius: 40px 5px 5px 40px;
+
+    color: white;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 5px;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+/* Aile principale — triangle swept-back sous le fuselage */
+.plane::before {
+    content: '';
+    position: absolute;
+    bottom: -24px;
+    left: 60px;
+    width: 90px;
+    height: 26px;
+    background: #002e6d;
+    clip-path: polygon(12% 0%, 0% 100%, 100% 100%, 88% 0%);
+    border-radius: 0 0 4px 4px;
+}
+
+/* Dérive verticale (queue) */
+.plane::after {
+    content: '';
+    position: absolute;
+    top: -28px;
+    right: 8px;
+    width: 36px;
+    height: 30px;
+    background: #002e6d;
+    clip-path: polygon(100% 100%, 0% 100%, 60% 0%);
+}
+
+/* --- L'Animation de vol de droite à gauche --- */
+@keyframes flyLeft {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    95% {
+        opacity: 1;
+    }
+    100% {
+        /* Traverse l'écran de 100% de sa largeur + la taille de l'avion */
+        transform: translateX(calc(-100vw - 200px));
+        opacity: 0;
+    }
+}
+
+.airbus {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 36px;
+    width: auto;
+    border-radius: 50%;
+}
+
+/* --- Le Déclencheur magique --- */
+/* Quand le bouton/checkbox est activé, on lance l'animation sur l'avion */
+#plane-trigger:checked ~ .plane {
+    animation: flyLeft 4s linear;
+}
+
+/* --- Herbe --- */
+.grass {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #2d5a27;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='60'><polygon points='0,60 8,10 16,60' fill='%234a7c3f'/><polygon points='14,60 22,25 30,60' fill='%23348a3a'/></svg>");
+    background-size: 30px 60px;
+    background-repeat: repeat-x;
+    background-position: bottom;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* --- Fleurs --- */
+#flower1-trigger,
+#flower2-trigger {
+    display: none;
+}
+
+.flower {
+    position: fixed;
+    bottom: 72px;
+    cursor: pointer;
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    z-index: 6;
+}
+
+.flower::before {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 20px;
+    background: #4a7c3f;
+    border-radius: 2px;
+}
+
+.flower-1 {
+    left: 20%;
+    background: #ffd700;
+    box-shadow:
+        0 -15px 0 6px #ff69b4,
+        0  15px 0 6px #ff69b4,
+        -15px 0 0 6px #ff69b4,
+         15px 0 0 6px #ff69b4,
+        -11px -11px 0 6px #ffb3d1,
+         11px -11px 0 6px #ffb3d1,
+        -11px  11px 0 6px #ffb3d1,
+         11px  11px 0 6px #ffb3d1;
+}
+
+.flower-2 {
+    right: 20%;
+    background: #ffe066;
+    box-shadow:
+        0 -15px 0 6px #b39ddb,
+        0  15px 0 6px #b39ddb,
+        -15px 0 0 6px #b39ddb,
+         15px 0 0 6px #b39ddb,
+        -11px -11px 0 6px #d1c4e9,
+         11px -11px 0 6px #d1c4e9,
+        -11px  11px 0 6px #d1c4e9,
+         11px  11px 0 6px #d1c4e9;
+}
+
+.spinner {
+    display: none;
+}
+
+#flower1-trigger:checked ~ .main-content .spinner {
+    display: block;
+}
+
+.secret-box {
+    display: none;
+}
+
+#flower2-trigger:checked ~ .main-content .secret-box {
+    display: block;
+    margin: 20px auto;
+    width: fit-content;
+    padding: 16px 28px;
+    border: 2px solid #b39ddb;
+    border-radius: 10px;
+    background: #f3f0ff;
+    font-family: monospace;
+    font-size: 1rem;
+    color: #333;
+    text-align: center;
+}
+
+/* --- Stats équipe --- */
+.stat_equipe {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin: 32px auto;
+    flex-wrap: wrap;
+}
+
+.stat_card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f5f5f5;
+    border: 2px solid #002e6d;
+    border-radius: 12px;
+    padding: 16px 28px;
+    min-width: 110px;
+}
+
+.stat_label {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat_number {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #002e6d;
+}
+
+/* --- Ping Pong --- */
+.spinner {
+  position: relative;
+  margin: 60px auto 0;
+  width: 300px;
+  height: 180px;
+  text-align: center;
+
+  .ball-container {
+    width: 40px;
+    transform: translate(130px, -140px);
+  }
+  .ball {
+    width: 40px;
+    transform-origin: bottom;
+    animation: bounce 500ms infinite alternate cubic-bezier(0.35, 0.50, 0.65, 0.50);
+    circle {
+      fill: #FFF;
+    }
+  }
+  .ball-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    transform-origin: bottom;
+    animation: bounce 500ms infinite alternate cubic-bezier(0.35, 0.50, 0.65, 0.50);
+  }
+  .raquet {
+    transform-origin: bottom;
+    width: 85px;
+    height: 142px;
+    #sor-1 {
+      fill: rgba(0, 0, 0, 0.2);
+      animation: shadow 500ms infinite 500ms alternate cubic-bezier(0.35, 0.50, 0.65, 0.50);
+    }
+    #sor-2 {
+      fill: rgba(0, 0, 0, 0.2);
+      animation: shadow 500ms infinite alternate cubic-bezier(0.35, 0.50, 0.65, 0.50);
+    }
+    &#r-1 {
+      transform: translateX(70px) rotateZ(45deg);
+      animation: hit-1 1000ms infinite 300ms ease-in-out;
+    }
+    &#r-2 {
+      transform: translateX(-70px) rotateZ(-45deg);
+      animation: hit-2 1000ms infinite -200ms ease-in-out;
+    }
+    .front { fill: #222; }
+    .middle { fill: #070; }
+    .back { fill: #D00; }
+    .handle {
+      &.outer { fill: #a8712a; }
+      &.inner { fill: #e0973e; }
+    }
+  }
+  .shadow {
+    transform: translateY(-150px);
+    -webkit-filter: blur(2px);
+    filter: blur(2px);
+    ellipse { fill: rgba(0, 0, 0, 0.1); }
+    #sr-1, #sr-2, #sb { transform-origin: center; }
+    #sr-1 { animation: grow 1000ms infinite -200ms ease-in-out; }
+    #sr-2 { animation: grow 1000ms infinite 300ms ease-in-out; }
+    #sb  { animation: swing 500ms infinite alternate cubic-bezier(0.35, 0.50, 0.65, 0.50); }
+  }
+}
+
+@keyframes bounce {
+  0%   { transform: rotateZ(45deg); }
+  100% { transform: rotateZ(-45deg); }
+}
+@keyframes swing {
+  0%        { opacity: 0; transform: translateX(70px) scale(1.2); }
+  25%, 75%  { opacity: 0; }
+  50%       { opacity: 1; transform: translateX(0px) scale(0.9); }
+  100%      { opacity: 0; transform: translateX(-70px) scale(1.2); }
+}
+@keyframes hit-1 {
+  0%, 50%, 100% { transform: translate(70px, 3px) rotateZ(45deg); }
+  75%           { transform: translate(69px, -2px) rotateZ(42deg); }
+}
+@keyframes hit-2 {
+  0%, 50%, 100% { transform: translate(-70px, 3px) rotateZ(-45deg); }
+  75%           { transform: translate(-69px, -2px) rotateZ(-42deg); }
+}
+@keyframes grow {
+  0%, 50%, 100% { transform: scale(1); }
+  75%           { transform: scale(0.9); }
+}
+@keyframes shadow {
+  0%, 40% { transform: translate(25px, 200px) scale(0.5); }
+  100%    { transform: translate(0px, 0px) scale(1); }
+}
