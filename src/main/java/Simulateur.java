@@ -31,7 +31,7 @@ public void start(Stage primaryStage) {
         String yStr = extraireValeur(jsonConfig, "nb_y");
 
         if (!xStr.isEmpty() && !yStr.isEmpty()) {
-            int tailleX = (int) Double.parseDouble(xStr);
+            int tailleX = (int) Double.parseDouble(xStr); // Gère le format float
             int tailleY = (int) Double.parseDouble(yStr);
             String nom = nomGrille.isEmpty() ? "Inconnue" : nomGrille;
             

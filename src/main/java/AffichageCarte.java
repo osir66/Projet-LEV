@@ -13,16 +13,23 @@ public class AffichageCarte extends Canvas {
 
     public void dessiner() {
         GraphicsContext gc = this.getGraphicsContext2D();
-        
+    
         gc.clearRect(0, 0, getWidth(), getHeight());
-        
+    
+        int colonnes = carte.getLargeurX();
+        int lignes = carte.getHauteurY();
+
         gc.setStroke(Color.LIGHTGRAY);
         gc.setLineWidth(0.5);
-        for (int x = 0; x < getWidth(); x += TAILLE_CASE) {
-            gc.strokeLine(x, 0, x, getHeight());
+    
+        for (int i = 0; i <= colonnes; i++) {
+            int x = i * TAILLE_CASE;
+            gc.strokeLine(x, 0, x, lignes * TAILLE_CASE);
         }
-        for (int y = 0; y < getHeight(); y += TAILLE_CASE) {
-            gc.strokeLine(0, y, getWidth(), y);
+    
+        for (int j = 0; j <= lignes; j++) {
+            int y = j * TAILLE_CASE;
+            gc.strokeLine(0, y, colonnes * TAILLE_CASE, y);
         }
 
         int baseX = carte.getBaseX() * TAILLE_CASE;

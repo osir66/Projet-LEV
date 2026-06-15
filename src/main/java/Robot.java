@@ -41,11 +41,37 @@ public class Robot implements Runnable {
             try {
                 if (missionActuelle == null && !retourBase) {
                     notifierPosition("Available");
-                    verifierNouvelleMission();
+                    
+                    synchronized (carte) {
+                        try {
+                            String reponseMissions = this.webClient.requeteGet("/api/list_missions");
+                            java.util.List<Missions> listeMissionsDuServeur = parserToutesMissions(reponseMissions);
+                            
+                            for (Missions m : listeMissionsDuServeur) {
+                                if (m.getStatut() != null && m.getStatut().equalsIgnoreCase("Awaiting")) {
+                                    
+                                    if (this.carte.reserverMission(m.getIdMission())) {
+                                        this.missionActuelle = m;
+                                        this.missionActuelle.setDateDebut(Instant.now().toString());
+                                        
+                                        System.out.println(String.format("[%s] Mission %s acceptée. Cible: (%d, %d)", 
+                                                this.nom, m.getIdMission(), m.getCibleX(), m.getCibleY()));
+                                        
+                                        changerEtatMission(this.missionActuelle, "Pending_robot", "");
+                                        
+                                        break; 
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Erreur lors de la vérification des missions (" + this.nom + ") : " + e.getMessage());
+                        }
+                    }
+
                 } else if (missionActuelle != null) {
                     avancerVersCible();
                 } else if (retourBase) {
-                    // Retour à la base
+                    // Retour base
                     int bx = carte.getBaseX();
                     int by = carte.getBaseY();
                     if (this.x < bx) this.x++;
@@ -203,9 +229,12 @@ public class Robot implements Runnable {
             if (status.isEmpty()) status = extraireValeur(bloc, "statut");
             
             if (!idMission.isEmpty() && !idSemaphore.isEmpty()) {
-                int cx = Math.abs(idSemaphore.hashCode() % 15) + 2; 
-                int cy = Math.abs(idSemaphore.hashCode() % 15) + 2;
-                
+                int maxX = this.carte.getLargeurX();
+                int maxY = this.carte.getHauteurY();
+
+                int cx = Math.abs(idSemaphore.hashCode() % maxX); 
+                int cy = Math.abs(idSemaphore.hashCode() % maxY);
+    
                 Missions m = new Missions(idMission, idSemaphore, symbole, cx, cy);
                 m.setStatut(status.isEmpty() ? "Awaiting" : status);
                 liste.add(m);
