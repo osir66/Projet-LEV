@@ -17,7 +17,7 @@ def list_semaphore():
         print (afficher_semaphore)
         return afficher_semaphore
     except Error as e:
-        print("Error:",e)
+        print("Erreur:",e)
         return "Erreur de l'affichage des semaphores", e
     finally:
         conn.commit()
@@ -34,7 +34,7 @@ def get_semaphore(id):
         afficher_semaphore = [dict(row) for row in c.fetchall()] #convertit chaque ligne retournées par la requete en dictionnaire Python
         return afficher_semaphore
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur de l'affichage du semaphore","de l'id :",id, e
     finally:
         conn.commit()
@@ -50,7 +50,7 @@ def add_semaphore(nom, type,coord_x,coord_y):
         c.execute('''INSERT INTO SEMAPHORES (id,name,type,coord_x,coord_y) VALUES (?, ?, ?, ?,?)''',
               (nouvel_uuid, nom, type,coord_x,coord_y))
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur lors de l'ajout du semaphore", e
     conn.commit()
     conn.close()
@@ -92,7 +92,7 @@ def update_semaphore(id, nom, state, type,coord_x,coord_y):
         print("Semaphore avec l'id", id, "a été modifié.")
         return "Semaphore modifié avec succès"
     except Error as e:
-        print("Error:", e)
+        print("Erreur:", e)
         return "Erreur lors de la modification du semaphore", e
     finally:
         conn.close()
@@ -110,7 +110,7 @@ def list_robots():
         afficher_robot = [dict(row) for row in c.fetchall()]   #convertit chaque ligne retournées par la requete en dictionnaire Python
         return afficher_robot
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur de l'affichage des robots", e
     finally:
         conn.commit()
@@ -127,7 +127,7 @@ def get_robot(id):
         afficher_robot = [dict(row) for row in c.fetchall()]        #convertit chaque ligne retournées par la requete en dictionnaire Python
         return afficher_robot
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur de l'affichage du robot","de l'id :",id, e
     finally:
         conn.commit()
@@ -144,7 +144,7 @@ def get_robot_mission(id):
         afficher_robot_mission = [dict(row) for row in c.fetchall()]        #convertit chaque ligne retournées par la requete en dictionnaire Python
         return afficher_robot_mission
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur", e
     finally:
         conn.commit()
@@ -162,7 +162,7 @@ def add_robot(nom,state,speed,position_x,position_y):
         c.execute('''INSERT INTO ROBOTS (id, name, state, speed, position_x, position_y) VALUES (?, ?, ?, ?, ?, ?)''',
                  (nouvel_uuid, nom, state, speed, position_x, position_y))
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur lors de l'ajout du robot", e
     conn.commit()
     conn.close()
@@ -202,7 +202,7 @@ def update_robot(id, nom, state, speed, position_x, position_y):
         print("Robot avec l'id", id, "a été modifié.")
         return "Robot modifié avec succès"
     except Error as e:
-        print ("Error:",e)
+        print ("Erreur:",e)
         return "Erreur lors de la modification du robot", e
     finally:
         conn.close()
@@ -221,7 +221,7 @@ def list_equipes():
         afficher_equipe = [dict(row) for row in c.fetchall()]
         return afficher_equipe
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur de l'affichage des équipes", e
     finally:
         conn.commit()
@@ -237,7 +237,7 @@ def ajouter_equipe(nom_equipe, ip_equipe,allowed):
         c.execute('''INSERT INTO TEAMS (id, name, ip, allowed) VALUES (?, ?, ?, ?)''',
               (nouvel_uuid, nom_equipe, ip_equipe, allowed))
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:",e)
         return "Erreur lors de l'ajout de l'équipe", e 
     conn.commit()
     conn.close()
@@ -271,7 +271,7 @@ def modifier_equipe(id, name, ip, allowed):
         print("L'équipe avec l'id", id, "a été modifiée.")
         return "Equipe modifiée avec succès"
     except Error as e:
-        print("Error:", e)
+        print("Erreur:", e)
         return "Erreur lors de la modification de l'équipe", e
     finally:
         conn.close()
@@ -291,7 +291,7 @@ def get_mission(team):
         afficher_mission_equipe = [dict(row) for row in c.fetchall()]
         return afficher_mission_equipe
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur de l'affichage de la mission missions", e
     finally:
         conn.commit()
@@ -307,7 +307,7 @@ def list_missions():
         afficher_mission = [dict(row) for row in c.fetchall()]
         return afficher_mission
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur de l'affichage des missions", e
     finally:
         conn.commit()
@@ -324,7 +324,7 @@ def ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)''',
                 (nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time))
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur : ", e)
         return "Erreur lors de l'ajout de la mission", e 
     conn.commit()
     conn.close()
@@ -378,7 +378,7 @@ def modifier_mission(id, name, semaphore_id, robot_id, shape_id, state, start_da
         print("La mission avec l'id :", id, "a été modifiée.")
         return "Mission modifiée avec succès" 
     except Error as e:
-        print("Error:", e)
+        print("Erreur:", e)
         return "Erreur lors de la modification de la mission", e  
     finally:
         conn.close()
@@ -393,7 +393,7 @@ def delete_missions_table():
         print("Table MISSIONS supprimée avec succès")
         return "Table MISSIONS supprimée avec succès"
     except Error as e:
-        print("Error:", e)
+        print("Erreur:", e)
         return "Erreur lors de la suppression de la table MISSIONS", e
     finally:
         conn.close()
@@ -412,7 +412,7 @@ def list_formes():
         afficher_forme = [dict(row) for row in c.fetchall()]
         return afficher_forme
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:",e)
         return "Erreur de l'affichage des formes", e
     finally:
         conn.commit()
@@ -428,7 +428,7 @@ def get_shape(id):
         afficher_forme = [dict(row) for row in c.fetchall()]
         return afficher_forme
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur de l'affichage de la forme","de l'id :",id, e
     finally:
         conn.commit()
@@ -444,7 +444,7 @@ def ajouter_forme(name, image):
         c.execute('''INSERT INTO SHAPES (id, name, image) VALUES (?, ?, ?)''',
               (nouvel_uuid, name, image))
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur:", e)
         return "Erreur lors de l'ajout de la forme", e 
     conn.commit()
     conn.close()
@@ -506,7 +506,7 @@ def get_config():
         afficher_config = [dict(row) for row in c.fetchall()]
         return afficher_config
     except Error as e:
-        print(f"Error: {e}")
+        print("Erreur :", e)
         return "Erreur de l'affichage des config", e
     finally:
         conn.commit()
