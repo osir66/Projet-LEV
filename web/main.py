@@ -12,9 +12,19 @@ app.mount("/front", StaticFiles(directory="front"), name="front")
 #------------------------------ Routes de la page d'accueil ----------------------------------
 
 # Route pour la page d’accueil
-@app.get("/", tags=["Interface"])
+@app.get("/commande", tags=["Interface"])
 def page_html():
     return FileResponse("index.html")
+@app.get("/", tags=["Interface"])
+def redirect_to_commande():
+    stats = db.getStatistique()
+    with open("stat.html", "r", encoding="utf-8") as f:
+        html = f.read()
+    html = html.replace("__COUNT_ROBOTS__",     str(stats["robots"]))
+    html = html.replace("__COUNT_SEMAPHORES__", str(stats["semaphores"]))
+    html = html.replace("__COUNT_FORMES__",     str(stats["formes"]))
+    html = html.replace("__COUNT_MISSIONS__",   str(stats["missions"]))
+    return HTMLResponse(content=html)
 
 #@app.get("/mattieux", tags=["Interface"])
 #def mattieux_page():

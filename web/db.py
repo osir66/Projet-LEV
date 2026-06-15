@@ -2,7 +2,6 @@ import base_projet
 import sqlite3
 from sqlite3 import Error
 import uuid
-import urllib.request
 
 #------------------------------ Fonctions des Sémaphores ----------------------------------
 
@@ -41,14 +40,14 @@ def get_semaphore(id):
         conn.close()
 
 #fonction qui permet d'ajouter un sémaphore 
-def add_semaphore(nom, duration, type,coord_x,coord_y):
+def add_semaphore(nom, type,coord_x,coord_y):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(nouvel_uuid, nom, duration, type,coord_x,coord_y)
+    print(nouvel_uuid, nom, type,coord_x,coord_y)
     try :
         c = conn.cursor()
-        c.execute('''INSERT INTO SEMAPHORES (id,name,duration,type,coord_x,coord_y) VALUES (?, ?, ?, ?,?,?)''',
-              (nouvel_uuid, nom, duration, type,coord_x,coord_y))
+        c.execute('''INSERT INTO SEMAPHORES (id,name,type,coord_x,coord_y) VALUES (?, ?, ?, ?,?)''',
+              (nouvel_uuid, nom, type,coord_x,coord_y))
     except Error as e:
         print(f"Error: {e}")
         return "Erreur lors de l'ajout du semaphore", e
@@ -57,7 +56,7 @@ def add_semaphore(nom, duration, type,coord_x,coord_y):
     return "Semaphore ajouté avec succès"
 
 #fonction qui permet de modifier un sémaphore en fonction de l'id
-def update_semaphore(id, nom, duration, state, type,coord_x,coord_y):
+def update_semaphore(id, nom, state, type,coord_x,coord_y):
     conn = sqlite3.connect("Massilia.db")
     c = conn.cursor()
     
@@ -66,7 +65,6 @@ def update_semaphore(id, nom, duration, state, type,coord_x,coord_y):
     
     #vérifie chaque paramètre 
     if nom is not None: champs.append("name = ?"); valeurs.append(nom)
-    if duration is not None: champs.append("duration = ?"); valeurs.append(duration)
     if state is not None: champs.append("state = ?"); valeurs.append(state)
     if type is not None: champs.append("type = ?"); valeurs.append(type)
     if coord_x is not None : champs.append("coord_x = ?"); valeurs.append(coord_x)
@@ -523,7 +521,7 @@ def faire_grille(name):
 
 #Fonction qui permet d'afficher les segments 
 def afficher_seg():
-    conn = sqlite3.connect("Massilia")
+    conn = sqlite3.connect("Massilia.db")
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     try :
@@ -537,28 +535,30 @@ def afficher_seg():
         conn.commit()
         conn.close()
 
-#------------------------------ Fonctions de comptage (API externe) -------------------
+#------------------------------ Fonctions de comptage -------------------
 
-BASE_URL = "http://127.168.1.96"
-
-def _fetch_count(endpoint):
+def _count_table(table):
+    conn = sqlite3.connect("Massilia.db")
     try:
-        with urllib.request.urlopen(f"{BASE_URL}{endpoint}", timeout=3) as r:
-            return r.read().decode().count('"id"')
-    except Exception:
-        return "?"
+        c = conn.cursor()
+        c.execute(f"SELECT COUNT(*) FROM {table}")
+        return c.fetchone()[0]
+    except Error:
+        return 0
+    finally:
+        conn.close()
 
 def count_robots():
-    return _fetch_count("/api/list_robots")
+    return _count_table("ROBOTS")
 
 def count_semaphores():
-    return _fetch_count("/api/list_semaphore")
+    return _count_table("SEMAPHORES")
 
 def count_formes():
-    return _fetch_count("/api/list_shapes")
+    return _count_table("SHAPES")
 
 def count_missions():
-    return _fetch_count("/api/list_missions")
+    return _count_table("MISSIONS")
 
 #------------------------------ Fonction Healthcheck ---------------------------------
 
@@ -571,6 +571,24 @@ def healthcheck():
         return "Connexion établie"
     except Error as e:
         return "Erreur de connexion :",e
+    finally:
+        conn.close()
+
+def getStatistique():
+    conn = sqlite3.connect("Massilia.db")
+    try:
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM ROBOTS")
+        robots = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM SEMAPHORES")
+        semaphores = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM SHAPES")
+        formes = c.fetchone()[0]
+        c.execute("SELECT COUNT(*) FROM MISSIONS")
+        missions = c.fetchone()[0]
+        return {"robots": robots, "semaphores": semaphores, "formes": formes, "missions": missions}
+    except Error as e:
+        return {"robots": 0, "semaphores": 0, "formes": 0, "missions": 0}
     finally:
         conn.close()
 
