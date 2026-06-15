@@ -37,7 +37,7 @@ def table():
                         name TEXT,
                         semaphore_id TEXT,
                         robot_id TEXT,
-                        shapes_id TEXT,
+                        shape_id TEXT,
                         team_id TEXT,
                         state TEXT,
                         start_date TEXT,
@@ -46,7 +46,7 @@ def table():
                         time TEXT,
                         FOREIGN KEY (semaphore_id) REFERENCES semaphores(id),
                         FOREIGN KEY (robot_id) REFERENCES robots(id),
-                        FOREIGN KEY (shapes_id) REFERENCES shapes(id),
+                        FOREIGN KEY (shape_id) REFERENCES shape(id),
                         FOREIGN KEY (team_id) REFERENCES teams(id)
                 )''')
         
@@ -82,9 +82,7 @@ def table():
     finally:
         conn.close()
 
-
 #table()
-
 
 
 

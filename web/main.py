@@ -1,9 +1,8 @@
 import db
 import base_projet
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
-import datetime
 from pathlib import Path
 
 app = FastAPI()
@@ -53,8 +52,8 @@ def get_semaphore(id: str):
 
 #route pour ajouter un sémaphore
 @app.post("/api/add_semaphore", tags=["Sémaphores"])
-def add_semaphore(name: str = Form(...), duration: int= Form(...), type: str= Form(...),coord_x : int= Form(...),coord_y:int= Form(...)):
-    return db.add_semaphore(name, duration, type,coord_x,coord_y)
+def add_semaphore(name: str = Form(...),type: str= Form(...),coord_x : int= Form(...),coord_y:int= Form(...)):
+    return db.add_semaphore(name, type,coord_x,coord_y)
 
 #route pour modifier un sémaphore en fonction de l'id
 @app.put("/api/update_semaphore/{id}", tags=["Sémaphores"])
@@ -100,7 +99,7 @@ def update_robot(id: str, name: str | None = None, state: str | None = None, spe
 #------------------------------ Routes des Missions --------------------------------
 
 #route pour afficher les missions d'un équipe 
-@app.get("/api/get_missions", tags=["Missions"])
+@app.get("/api/list_missions_by_team", tags=["Missions"])
 def get_missions(team : str):
     return db.get_mission(team)
 
@@ -171,9 +170,16 @@ def update_shape (id: str, name: str | None = None, image: str | None = None):
     return db.update_shape(id,name,image)
 
 #route pour trouver le fichier csv dans le fichier "fish"
-@app.post("/api/import_shape_csv",tags = ["Formes"])
-def  import_shape_csv(Nom : str):
-    c = Path(__file__).resolve().parent.parent / "fish" / Nom
+@app.post("/api/import_shape_csv", tags=["Formes"])
+async def import_shape_csv(file: UploadFile = File(...)):
+    
+    #chemin ou le fichier sera enregistré 
+    c = Path(__file__).resolve().parent.parent / "fish" / file.filename
+    
+    #lis le fichier et l'enregistre 
+    fichier_contenu = await file.read()
+    c.write_bytes(fichier_contenu)
+    
     resultat = db.import_csv(str(c))
     if resultat is None:
         return "fichier introuvable "

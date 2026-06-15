@@ -65,11 +65,21 @@ def update_semaphore(id, nom, state, type,coord_x,coord_y):
     valeurs = []        #création d'une liste qui contriendra les valeurs correspondante 
     
     #vérifie chaque paramètre 
-    if nom is not None: champs.append("name = ?"); valeurs.append(nom)
-    if state is not None: champs.append("state = ?"); valeurs.append(state)
-    if type is not None: champs.append("type = ?"); valeurs.append(type)
-    if coord_x is not None : champs.append("coord_x = ?"); valeurs.append(coord_x)
-    if coord_y is not None : champs.append("coord_y = ?"); valeurs.append(coord_y)
+    if nom is not None: 
+        champs.append("name = ?")
+        valeurs.append(nom)
+    if state is not None:
+        champs.append("state = ?")
+        valeurs.append(state)
+    if type is not None: 
+        champs.append("type = ?")
+        valeurs.append(type)
+    if coord_x is not None : 
+        champs.append("coord_x = ?")
+        valeurs.append(coord_x)
+    if coord_y is not None : 
+        champs.append("coord_y = ?")
+        valeurs.append(coord_y)
 
     
     if not champs:
@@ -166,11 +176,21 @@ def update_robot(id, nom, state, speed, position_x, position_y):
     champs = []
     valeurs = []
     
-    if nom is not None: champs.append("name = ?"); valeurs.append(nom)
-    if state is not None: champs.append("state = ?"); valeurs.append(state)
-    if speed is not None: champs.append("speed = ?"); valeurs.append(speed)
-    if position_x is not None: champs.append("position_x = ?"); valeurs.append(position_x)
-    if position_y is not None: champs.append("position_y = ?"); valeurs.append(position_y)
+    if nom is not None: 
+        champs.append("name = ?")
+        valeurs.append(nom)
+    if state is not None: 
+        champs.append("state = ?")
+        valeurs.append(state)
+    if speed is not None: 
+        champs.append("speed = ?")
+        valeurs.append(speed)
+    if position_x is not None: 
+        champs.append("position_x = ?")
+        valeurs.append(position_x)
+    if position_y is not None: 
+        champs.append("position_y = ?")
+        valeurs.append(position_y)
     
     if not champs:
         conn.close()
@@ -231,9 +251,15 @@ def modifier_equipe(id, name, ip, allowed):
     champs = []
     valeurs = []
     
-    if name is not None: champs.append("name = ?"); valeurs.append(name)
-    if ip is not None: champs.append("ip = ?"); valeurs.append(ip)
-    if allowed is not None: champs.append("allowed = ?"); valeurs.append(allowed)
+    if name is not None: 
+        champs.append("name = ?")
+        valeurs.append(name)
+    if ip is not None: 
+        champs.append("ip = ?")
+        valeurs.append(ip)
+    if allowed is not None: 
+        champs.append("allowed = ?")
+        valeurs.append(allowed)
     
     if not champs:
         conn.close()
@@ -294,7 +320,7 @@ def ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_
     print(nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time)
     try :
         c = conn.cursor()
-        c.execute('''INSERT INTO MISSIONS (id, name, semaphore_id, robot_id,shapes_id, team_id,state, start_date, end_date,team, time) 
+        c.execute('''INSERT INTO MISSIONS (id, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)''',
                 (nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time))
     except Error as e:
@@ -313,15 +339,33 @@ def modifier_mission(id, name, semaphore_id, robot_id, shape_id, state, start_da
     champs = []
     valeurs = []
     
-    if name is not None: champs.append("name = ?"); valeurs.append(name)
-    if semaphore_id is not None: champs.append("semaphore_id = ?"); valeurs.append(semaphore_id)
-    if robot_id is not None: champs.append("robot_id = ?"); valeurs.append(robot_id)
-    if shape_id is not None: champs.append("shapes_id = ?"); valeurs.append(shape_id)
-    if state is not None: champs.append("state = ?"); valeurs.append(state)
-    if start_date is not None: champs.append("start_date = ?"); valeurs.append(start_date)
-    if end_date is not None: champs.append("end_date = ?"); valeurs.append(end_date)
-    if team is not None: champs.append("team = ?"); valeurs.append(team)
-    if time is not None: champs.append("time = ?"); valeurs.append(time)
+    if name is not None:
+        champs.append("name = ?")
+        valeurs.append(name)
+    if semaphore_id is not None: 
+        champs.append("semaphore_id = ?")
+        valeurs.append(semaphore_id)
+    if robot_id is not None: 
+        champs.append("robot_id = ?")
+        valeurs.append(robot_id)
+    if shape_id is not None:
+        champs.append("shape_id = ?") 
+        valeurs.append(shape_id)
+    if state is not None: 
+        champs.append("state = ?")
+        valeurs.append(state)
+    if start_date is not None: 
+        champs.append("start_date = ?") 
+        valeurs.append(start_date)
+    if end_date is not None: 
+        champs.append("end_date = ?") 
+        valeurs.append(end_date)
+    if team is not None: 
+        champs.append("team = ?")
+        valeurs.append(team)
+    if time is not None:
+        champs.append("time = ?") 
+        valeurs.append(time)
     
     if not champs:
         conn.close()
@@ -414,8 +458,12 @@ def update_shape(id, name, image):
     champs = []
     valeurs = []
     
-    if name is not None: champs.append("name = ?"); valeurs.append(name)
-    if image is not None: champs.append("image = ?"); valeurs.append(image)
+    if name is not None:
+        champs.append("name = ?")
+        valeurs.append(name)
+    if image is not None: 
+        champs.append("image = ?")
+        valeurs.append(image)
     
     if not champs:
         conn.close()
