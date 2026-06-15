@@ -5,30 +5,22 @@ from math import sin, cos, radians, hypot, atan2, degrees
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
-# couleurs
 gris = "#3a3a3a"
 noir = "#111111"
-taille = 540
+taille = 300
 
-# variables qu on va utiliser partout
 points = []
 angle = 0
 vitesse = 3
 angle_avant = [0, 90, 180, 270]
 
 
-# on change la vitesse quand on appuie sur entree
-def changer_vitesse(event):
+# on change la vitesse avec le slider
+def changer_vitesse(valeur):
     global vitesse
-    try:
-        valeur = float(case_vitesse.get())
-        if valeur > 0 and valeur <= 15:
-            vitesse = valeur
-    except:
-        pass
+    vitesse = float(valeur)
 
 
-# on ouvre un fichier csv et on prepare les points
 def charger():
     chemin = filedialog.askopenfilename(filetypes=[("CSV", "*.csv")])
     if chemin == "":
@@ -39,11 +31,9 @@ def charger():
     preparer(texte)
 
 
-# on transforme le csv en points avec un rayon et un angle
 def preparer(texte):
     global points, angle, angle_avant
 
-    # on lit chaque ligne sauf la premiere qui est le nom
     sommets = []
     lignes = texte.strip().split("\n")
     for ligne in lignes[1:]:
@@ -65,7 +55,6 @@ def preparer(texte):
             nombre = int(distance * 4)
             if nombre < 2:
                 nombre = 2
-            # on glisse de l ancien point vers le nouveau
             for i in range(nombre + 1):
                 t = i / nombre
                 point_x = ancien_x + (x - ancien_x) * t
@@ -85,11 +74,11 @@ def preparer(texte):
     milieu_x = (max(tous_les_x) + min(tous_les_x)) / 2
     milieu_y = (max(tous_les_y) + min(tous_les_y)) / 2
 
-    # on calcule de combien agrandir le dessin
+    # on calcule l echelle pour rentrer dans 300x300
     largeur = max(tous_les_x) - min(tous_les_x)
     hauteur = max(tous_les_y) - min(tous_les_y)
     plus_grand = max(largeur, hauteur, 1)
-    echelle = 240 / plus_grand
+    echelle = 120 / plus_grand
 
     # on transforme chaque point en rayon et angle
     points = []
@@ -105,44 +94,36 @@ def preparer(texte):
     angle_avant = [0, 90, 180, 270]
 
 
-# appelee par le serveur quand le semaphore est une helice
 def charger_depuis_texte(texte):
     preparer(texte)
 
 
-# on allume une led puis on la supprime apres un court instant
 def allumer_led(x, y):
     led = canvas.create_oval(x - 3, y - 3, x + 3, y + 3, fill="cyan", outline="")
     fenetre.after(120, lambda: canvas.delete(led))
 
 
-# boucle qui fait tourner les branches
 def animer():
     global angle, angle_avant
 
     angle = angle + vitesse
     centre = taille // 2
 
-    # on efface les anciennes branches
     canvas.delete("branche")
 
-    # on a 4 branches separees de 90 degres
     for b in range(4):
         angle_branche = (angle + b * 90) % 360
         radian = radians(angle_branche)
 
-        # on dessine la branche
-        bout_x = centre + 250 * cos(radian)
-        bout_y = centre + 250 * sin(radian)
+        bout_x = centre + 130 * cos(radian)
+        bout_y = centre + 130 * sin(radian)
         canvas.create_line(centre, centre, bout_x, bout_y,
                            fill="#444444", width=2, tags="branche")
 
-        # on regarde tous les points
         avant = angle_avant[b] % 360
         for rayon, angle_point in points:
             pas_branche = (angle_branche - avant) % 360
             pas_point = (angle_point - avant) % 360
-            # si la branche vient de passer sur le point on l allume
             if pas_point >= 0 and pas_point <= pas_branche:
                 x = centre + rayon * cos(radians(angle_point))
                 y = centre + rayon * sin(radians(angle_point))
@@ -156,7 +137,7 @@ def animer():
 # --- creation de la fenetre ---
 fenetre = ctk.CTk()
 fenetre.title("Helice POV LEV")
-fenetre.geometry("620x680")
+fenetre.geometry("380x470")
 fenetre.configure(fg_color=gris)
 
 # barre du haut avec le bouton charger
@@ -179,22 +160,17 @@ canvas = ctk.CTkCanvas(cadre_canvas, width=taille, height=taille,
                        bg=noir, highlightthickness=0, bd=0)
 canvas.pack(padx=8, pady=8)
 
-# barre du bas avec la vitesse
+# barre du bas avec la jauge de vitesse
 barre_bas = ctk.CTkFrame(fenetre, fg_color=gris)
 barre_bas.pack(fill="x", padx=20, pady=10)
 
 ctk.CTkLabel(barre_bas, text="Vitesse", text_color="#cccccc",
              font=("Arial", 11)).pack(side="left")
 
-case_vitesse = ctk.CTkEntry(barre_bas, width=80, font=("Arial", 12),
-                            fg_color="#4a4a4a", text_color="white",
-                            border_width=0, corner_radius=8,
-                            placeholder_text="3")
-case_vitesse.pack(side="left", padx=10)
-case_vitesse.bind("<Return>", changer_vitesse)
-
-ctk.CTkLabel(barre_bas, text="entree pour valider", text_color="#888888",
-             font=("Arial", 10)).pack(side="left")
+jauge_vitesse = ctk.CTkSlider(barre_bas, from_=0.5, to=15,
+                               command=changer_vitesse)
+jauge_vitesse.set(3)
+jauge_vitesse.pack(side="left", padx=10, fill="x", expand=True)
 
 animer()
 fenetre.mainloop()

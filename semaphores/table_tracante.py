@@ -7,7 +7,7 @@ ctk.set_default_color_theme("dark-blue")
 # couleurs
 gris = "#3a3a3a"
 noir = "#111111"
-taille = 540
+taille = 300
 
 # variables qu on va utiliser partout
 points = []
@@ -30,7 +30,7 @@ def changer_vitesse(event):
 
 # on adapte les coordonnees du csv a la taille du canvas
 def normaliser(liste):
-    marge = 40
+    marge = 20
     tous_les_x = []
     tous_les_y = []
     for x, y, stylo in liste:
@@ -115,7 +115,7 @@ def tracer():
 # --- creation de la fenetre ---
 fenetre = ctk.CTk()
 fenetre.title("Table Tracante LEV")
-fenetre.geometry("620x680")
+fenetre.geometry("380x440")
 fenetre.configure(fg_color=gris)
 
 # barre du haut avec le bouton charger
