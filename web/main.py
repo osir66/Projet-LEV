@@ -4,6 +4,7 @@ from fastapi import FastAPI, Form
 from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import datetime
+from pathlib import Path
 
 app = FastAPI()
 
@@ -158,6 +159,15 @@ def add_shape(name: str = Form(...), image: str = Form(...)):
 @app.put("/update_shape/{id}", tags = ["Formes"])
 def update_shape (id: str, name: str | None = None, image: str | None = None):
     return db.update_shape(id,name,image)
+
+#route pour trouver le fichier csv dans le fichier "fish"
+@app.post("/api/import_shape_csv",tags = ["Formes"])
+def  import_shape_csv(Nom : str):
+    c = Path(__file__).resolve().parent.parent / "fish" / Nom
+    resultat = db.import_csv(str(c))
+    if resultat is None:
+        return "fichier introuvable "
+    return resultat
 
 #-----------------------------------------------------------------------------------
 

@@ -3,6 +3,7 @@ import sqlite3
 from sqlite3 import Error
 import uuid
 import urllib.request
+from pathlib import Path
 
 #------------------------------ Fonctions des Sémaphores ----------------------------------
 
@@ -430,6 +431,19 @@ def update_shape(id, name, image):
         return "Erreur lors de la modification :", e   
     finally:
         conn.close()
+
+#fonction qui permet d'importer le csv 
+def import_csv(csv):
+    fichier = Path(csv)
+    if not fichier.exists():
+        return None
+    contenu = fichier.read_text(encoding="utf-8").strip()
+    lignes = contenu.splitlines()
+    if not lignes:
+        return None
+    name = lignes[0].strip()
+    image = "\n".join(lignes[1:])
+    return ajouter_forme(name, image)
 
 
 #---------------------------------------------------------------------------------
