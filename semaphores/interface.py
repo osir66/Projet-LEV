@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from lettres import LETTRES
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
@@ -7,72 +6,54 @@ ctk.set_default_color_theme("dark-blue")
 gris = "#3a3a3a"
 noir = "#111111"
 
-# variables globales
-lettre_courante = 'A'
-grille = LETTRES[lettre_courante]
+caractere = "A"
 canvas = None
 fenetre = None
 label_lettre = None
 case_lettre = None
 
 
-# on change la lettre manuellement depuis le champ texte
 def changer_lettre():
-    global lettre_courante, grille
-    texte = case_lettre.get().upper()
-    if texte in LETTRES:
-        lettre_courante = texte
-        grille = LETTRES[texte]
-        label_lettre.configure(text=texte)
+    global caractere
+    texte = case_lettre.get()
+    if len(texte) > 0:
+        caractere = texte[0]
+        label_lettre.configure(text=caractere)
         dessiner()
 
 
-# on change la lettre automatiquement depuis le serveur
 def changer_lettre_auto(forme, nom_mission=""):
-    global lettre_courante, grille
-    if forme in LETTRES:
-        lettre_courante = forme
-        grille = LETTRES[forme]
+    global caractere
+    if len(forme) > 0:
+        caractere = forme[0]
         if nom_mission != "":
-            label_lettre.configure(text=forme + "  " + nom_mission)
+            label_lettre.configure(text=caractere + "  " + nom_mission)
         else:
-            label_lettre.configure(text=forme)
+            label_lettre.configure(text=caractere)
         dessiner()
 
-# on efface le canvas quand il n y a plus de mission
+
 def vider():
     canvas.delete("all")
     label_lettre.configure(text="")
 
-# on dessine la lettre au centre du canvas 300x300
+
 def dessiner():
     canvas.delete("all")
-    taille_led = 15
-    nb_colonnes = len(grille[0])
-    nb_lignes = len(grille)
-    centre_x = 150
-    centre_y = 150
-    debut_x = centre_x - nb_colonnes * taille_led // 2
-    debut_y = centre_y - nb_lignes * taille_led // 2
-
-    for ligne in range(nb_lignes):
-        for colonne in range(nb_colonnes):
-            led = grille[ligne][colonne]
-            if led[0] == 1:
-                x = debut_x + colonne * taille_led + taille_led // 2
-                y = debut_y + ligne * taille_led + taille_led // 2
-                couleur = f'#{led[1]:02x}{led[2]:02x}{led[3]:02x}'
-                canvas.create_oval(x - 5, y - 5, x + 5, y + 5,
-                                   fill=couleur, outline='')
+    canvas.create_text(150, 150, text=caractere,
+                       fill="white", font=("Courier", 120, "bold"))
 
 
-# boucle qui rafraichit l affichage
+# boucle qui rafraichit l affichage en verifiant que la fenetre existe encore
 def animer():
-    dessiner()
-    fenetre.after(100, animer)
+    try:
+        if fenetre and fenetre.winfo_exists():
+            dessiner()
+            fenetre.after(500, animer)
+    except:
+        pass
 
 
-# on cree tous les widgets dans la fenetre passee en parametre
 def lancer(root):
     global canvas, fenetre, label_lettre, case_lettre
 
@@ -82,7 +63,6 @@ def lancer(root):
     fenetre.configure(fg_color=gris)
     fenetre.resizable(True, True)
 
-    # barre du haut
     barre_haut = ctk.CTkFrame(fenetre, fg_color=gris)
     barre_haut.pack(fill="x", padx=20, pady=10)
 
@@ -104,7 +84,6 @@ def lancer(root):
                                  font=("Arial", 11), fg_color=gris)
     label_lettre.pack(side="right")
 
-    # canvas
     cadre_canvas = ctk.CTkFrame(fenetre, fg_color=noir, corner_radius=12)
     cadre_canvas.pack(padx=20, pady=6)
 
@@ -112,7 +91,6 @@ def lancer(root):
                            bg=noir, highlightthickness=0, bd=0)
     canvas.pack(padx=8, pady=8)
 
-    # barre du bas
     barre_bas = ctk.CTkFrame(fenetre, fg_color=gris)
     barre_bas.pack(fill="x", padx=20, pady=10)
 
@@ -122,7 +100,6 @@ def lancer(root):
     animer()
 
 
-# si on lance interface.py directement
 if __name__ == "__main__":
     root = ctk.CTk()
     lancer(root)
