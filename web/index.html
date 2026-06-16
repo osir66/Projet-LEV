@@ -46,9 +46,9 @@
                     <label>Type :</label>
                     <select name="type" required>
                         <option value="" disabled selected>Sélectionnez un type</option>
-                        <option value="Helice">Helice</option>
-                        <option value="Table">Table</option>
-                        <option value="Symbole">Symbole</option>
+                        <option value="helice">helice</option>
+                        <option value="table">table</option>
+                        <option value="symbole">Symbole</option>
                     </select>
                 </div>
                 
@@ -61,8 +61,10 @@
         <div class="card">
             <h2>Ajouter une Forme</h2>
             <form id="form-shape" action="/api/add_shape" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
-                <div class="form-group" style="margin-top: 20px;"><label>Nom :</label><input type="text" name="name" required></div>
-                <div class="form-group"><label>Image :</label><input type="text" name="image" required></div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Nom :</label> <input type="text" name="name" required>
+                    <label>Image</label> <input type="text" name="image" required>
+                </div>
                 <button type="submit">Ajouter</button>
             </form>
         </div>
@@ -77,14 +79,25 @@
             <button type="submit">Ajouter</button>
         </form>
         </div>
-       <div class="card">
+      <div class="card">
             <h2>Importer une Forme (CSV)</h2>
             <form action="/api/import_shape_csv" method="POST" enctype="multipart/form-data">
-            <div class="form-group" style="margin-top: 20px;">
-            <input type="file" name="file" accept=".csv" required>
+                <div class="form-group" style="margin-top: 20px;">
+                    <input type="file" name="file" accept=".csv" required>
+                </div>
+                <button type="submit" style="margin-top: 15px; width: 100%;">Importer</button>
+            </form>
+        </div> <div class="card">
+            <h2>Générer la grille</h2>
+            <form id="form-creer-grille" action="/api/creer_grille" method="POST" target="hiddenFrame" onsubmit="document.querySelector('[name=hiddenFrame]').submitted = true;">
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Nom de la grille :</label>
+                    <input type="text" name="name" required>
+                </div>
+                <button type="submit" style="margin-top: 15px; width: 100%;">Générer</button>
+            </form>
         </div>
-        <button type="submit" style="margin-top: 15px; width: 100%;">Importer</button>
-    </form>
+</html>
 </div>
     </div>
 

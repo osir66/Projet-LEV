@@ -58,10 +58,10 @@ def add_semaphore(name: str = Form(...),type: str= Form(...),coord_x : int= Form
 #route pour modifier un sémaphore en fonction de l'id
 @app.put("/api/update_semaphore/{id}", tags=["Sémaphores"])
 def update_semaphore(id: str, name: str | None = None, state: str | None = None,
-                           duration: int | None = None, type: str | None = None,
+                            type: str | None = None,
                            coord_x : int| None = None,
                            coord_y : int | None = None):
-    return db.update_semaphore(id, name, duration, state, type,coord_x,coord_y)
+    return db.update_semaphore(id, name, state, type,coord_x,coord_y)
 
 #-----------------------------------------------------------------------------------
 
@@ -155,14 +155,14 @@ def list_formes():
     return db.list_formes()
 
 #route pour afficher la forme en fonction de son id 
-@app.post("/api/shapes/{id}", tags=["Formes"])
+@app.get("/api/shape/{id}", tags=["Formes"])
 def get_shape(id: str):
     return db.get_shape(id)
 
 #route pour ajouter une forme 
 @app.post("/api/add_shape", tags=["Formes"])
-def add_shape(name: str = Form(...), image: str = Form(...)):
-    return db.ajouter_forme(name, image)
+def add_shape(name: str = Form(...),image: str = Form(...)):
+    return db.ajouter_forme(name,image)
 
 #route pour modifier une forme en fonction de l'id
 @app.put("/update_shape/{id}", tags = ["Formes"])
