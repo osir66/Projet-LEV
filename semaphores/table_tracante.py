@@ -4,10 +4,12 @@ from tkinter import filedialog
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
+# couleurs et taille du canvas
 gris = "#3a3a3a"
 noir = "#111111"
 taille = 300
 
+# variables qu on va utiliser partout
 points = []
 position = 0
 ancien_x = 0
@@ -15,28 +17,29 @@ ancien_y = 0
 vitesse = 20
 canvas = None
 fenetre_tt = None
-case_vitesse = None
 
 
-def changer_vitesse(event):
+def changer_vitesse(valeur):
+    """met a jour la vitesse de tracage quand on bouge la jauge
+    plus la jauge est basse plus le trace est lent"""
     global vitesse
-    try:
-        valeur = int(case_vitesse.get())
-        if valeur >= 1 and valeur <= 100:
-            vitesse = valeur
-    except:
-        pass
+    vitesse = int(float(valeur))
 
 
 def normaliser(liste):
+    """adapte les coordonnees du csv a la taille reelle du canvas 300x300
+    en gardant les proportions et une marge sur les bords"""
     marge = 20
+
     tous_les_x = [p[0] for p in liste]
     tous_les_y = [p[1] for p in liste]
     petit_x = min(tous_les_x)
     petit_y = min(tous_les_y)
     largeur = max(tous_les_x) - petit_x
     hauteur = max(tous_les_y) - petit_y
+
     zone = taille - 2 * marge
+
     result = []
     for x, y, stylo in liste:
         nx = marge + (x - petit_x) / largeur * zone
@@ -46,6 +49,8 @@ def normaliser(liste):
 
 
 def charger():
+    """ouvre une fenetre pour choisir un fichier csv sur l ordinateur
+    et lance le chargement de son contenu"""
     chemin = filedialog.askopenfilename(filetypes=[("CSV", "*.csv")])
     if chemin == "":
         return
@@ -56,45 +61,87 @@ def charger():
 
 
 def charger_depuis_texte(texte):
+    """lit un texte au format csv venant du fichier ou du serveur
+    extrait les points x y stylo et lance le tracage"""
     global points, position, ancien_x, ancien_y
+
+    texte = texte.replace("\r\n", "\n").replace("\r", "\n")
+
+    lignes = texte.strip().split("\n")
+
+    premiere = lignes[0].strip().split(";")
+    if len(premiere) >= 4:
+        debut = 0
+    else:
+        debut = 1
+
     liste = []
-    for ligne in texte.strip().split("\n")[1:]:
+    for ligne in lignes[debut:]:
         morceaux = ligne.strip().split(";")
         if len(morceaux) >= 4:
             x = float(morceaux[1])
             y = float(morceaux[2])
-            stylo = int(morceaux[3])
+            stylo_brut = morceaux[3].strip()
+            stylo = int(stylo_brut[0]) if stylo_brut else 0
             liste.append((x, y, stylo))
+
     if len(liste) == 0:
         return
+
     points = normaliser(liste)
     position = 0
     canvas.delete("all")
+
     ancien_x = points[0][0]
     ancien_y = points[0][1]
     tracer()
 
 
 def tracer():
+    """trace un point a la fois en reliant les points avec le stylo baisse
+    se rappelle elle meme jusqu a la fin puis remet le stylo au repos"""
     global position, ancien_x, ancien_y
+
     if position >= len(points):
+        x0 = taille
+        y0 = 0
+        canvas.delete("rail")
+        canvas.create_line(0, y0, taille, y0, fill="#666666", width=2, tags="rail")
+        canvas.create_line(x0, 0, x0, taille, fill="#666666", width=2, tags="rail")
+        canvas.delete("stylo")
+        canvas.create_oval(x0 - 5, y0 - 5, x0 + 5, y0 + 5,
+                           fill="red", outline="", tags="stylo")
         return
+
     x = points[position][0]
     y = points[position][1]
     stylo = points[position][2]
+
     if stylo == 1 and position > 0:
         canvas.create_line(ancien_x, ancien_y, x, y, fill="cyan", width=2)
+
     ancien_x = x
     ancien_y = y
     position = position + 1
-    delai = 110 - vitesse
+
+    canvas.delete("rail")
+    canvas.create_line(0, y, taille, y, fill="#666666", width=2, tags="rail")
+    canvas.create_line(x, 0, x, taille, fill="#666666", width=2, tags="rail")
+
+    canvas.delete("stylo")
+    canvas.create_oval(x - 5, y - 5, x + 5, y + 5,
+                       fill="red", outline="", tags="stylo")
+
+    delai = int(500 - vitesse * 4)
     if delai < 10:
         delai = 10
     fenetre_tt.after(delai, tracer)
 
 
 def lancer(root):
-    global canvas, fenetre_tt, case_vitesse
+    """construit toute l interface bouton charger canvas et jauge
+    dans la fenetre recue en parametre"""
+    global canvas, fenetre_tt
 
     fenetre_tt = root
     fenetre_tt.title("Table Tracante LEV")
@@ -125,15 +172,10 @@ def lancer(root):
     ctk.CTkLabel(barre_bas, text="Vitesse", text_color="#cccccc",
                  font=("Arial", 11)).pack(side="left")
 
-    case_vitesse = ctk.CTkEntry(barre_bas, width=80, font=("Arial", 12),
-                                fg_color="#4a4a4a", text_color="white",
-                                border_width=0, corner_radius=8,
-                                placeholder_text="20")
-    case_vitesse.pack(side="left", padx=10)
-    case_vitesse.bind("<Return>", changer_vitesse)
-
-    ctk.CTkLabel(barre_bas, text="entree pour valider", text_color="#888888",
-                 font=("Arial", 10)).pack(side="left")
+    jauge_vitesse = ctk.CTkSlider(barre_bas, from_=1, to=100,
+                                   command=changer_vitesse)
+    jauge_vitesse.set(20)
+    jauge_vitesse.pack(side="left", padx=10, fill="x", expand=True)
 
 
 if __name__ == "__main__":

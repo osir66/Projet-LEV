@@ -2,7 +2,7 @@ import customtkinter as ctk
 import urllib.request
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from parseur import lire_json
 
 ip = input("IP du serveur (ex: 192.168.1.22) : ")
@@ -17,6 +17,7 @@ fenetre_helice = None
 
 
 def get_json(route):
+    """envoie une requete get au serveur et lit la reponse avec le parseur maison"""
     try:
         with urllib.request.urlopen(f"{SERVEUR}{route}", timeout=5) as r:
             return lire_json(r.read().decode())
@@ -25,6 +26,7 @@ def get_json(route):
 
 
 def put(route):
+    """envoie une requete put sans contenu au serveur pour changer un etat"""
     try:
         req = urllib.request.Request(f"{SERVEUR}{route}", method='PUT')
         req.add_header("Content-Length", "0")
@@ -34,10 +36,12 @@ def put(route):
 
 
 def maintenant():
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
+    """donne l heure locale actuelle au format attendu par le serveur"""
+    return datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f000Z")
 
 
 def ouvrir_symbole(caractere, nom_mission):
+    """ouvre la fenetre symbole si besoin puis affiche le caractere demande"""
     global fenetre_symbole
     import interface
     if fenetre_symbole is None or not fenetre_symbole.winfo_exists():
@@ -47,6 +51,7 @@ def ouvrir_symbole(caractere, nom_mission):
 
 
 def ouvrir_table(image_shape):
+    """ouvre la fenetre table tracante si besoin puis charge le csv recu"""
     global fenetre_table
     import table_tracante
     if fenetre_table is None or not fenetre_table.winfo_exists():
@@ -57,6 +62,7 @@ def ouvrir_table(image_shape):
 
 
 def ouvrir_helice(image_shape):
+    """ouvre la fenetre helice si besoin puis charge le csv recu"""
     global fenetre_helice
     import helice as helice_module
     if fenetre_helice is None or not fenetre_helice.winfo_exists():
@@ -67,13 +73,14 @@ def ouvrir_helice(image_shape):
 
 
 def traiter_mission(m, type_sem, shape):
+    """traite une mission du debut a la fin dans un thread separe
+    ouvre la bonne fenetre attend la duree puis previent le serveur et ferme"""
     global mission_active, fenetre_symbole, fenetre_table, fenetre_helice
     duree = int(m["time"]) if m["time"] else 10
 
-    image_shape = shape["image"].strip()
+    image_shape = shape["image"].strip() if shape["image"] else ""
     nom_shape = shape["name"].strip()
 
-    # si image est un seul caractere on l utilise sinon on prend le name
     if len(image_shape) == 1:
         caractere = image_shape
     else:
@@ -101,7 +108,6 @@ def traiter_mission(m, type_sem, shape):
 
     missions_terminees.add(m["id"])
 
-    # on ferme la fenetre apres la mission
     try:
         if type_sem in ["symbole", "ascii"] and fenetre_symbole and fenetre_symbole.winfo_exists():
             root.after(0, fenetre_symbole.destroy)
@@ -119,6 +125,8 @@ def traiter_mission(m, type_sem, shape):
 
 
 def surveiller_serveur():
+    """boucle qui tourne toutes les 2 secondes et cherche une mission en attente
+    si elle en trouve une elle la lance dans un nouveau thread"""
     global mission_active
 
     if mission_active is None:
@@ -136,7 +144,6 @@ def surveiller_serveur():
 
                 etat = m["state"].strip().lower()
 
-                # on gere les deux noms de champ shapes_id et shape_id
                 shape_id = m.get("shapes_id") or m.get("shape_id")
 
                 if etat == "pending_semaphore":
@@ -156,18 +163,19 @@ def surveiller_serveur():
                         t.start()
                         break
                     else:
-                        # LE FILET DE SECURITE
-                        print(f"Erreur BDD : La mission {m['name']} (ID: {m['id']}) utilise une shape_id introuvable.")
-                        # Optionnel : marquer la mission corrompue comme Error pour ne plus boucler dessus
-                        # put("/api/update_mission/" + m["id"] + "?state=Error")
+                        print("erreur la mission " + m["name"] + " utilise une shape introuvable")
 
     threading.Timer(2, surveiller_serveur).start()
 
 
-# fenetre invisible pour faire tourner tkinter
 root = ctk.CTk()
 root.withdraw()
 
 threading.Timer(0, surveiller_serveur).start()
 
 root.mainloop()
+
+# main.py — le cerveau. Il demande l'IP, surveille le serveur en boucle (surveiller_serveur),
+# et quand une mission arrive il décide quoi faire (traiter_mission) et ouvre la bonne fenêtre 
+# (ouvrir_symbole, ouvrir_table, ouvrir_helice). C'est le seul fichier qui parle au serveur 
+# via get_json et put.

@@ -5,13 +5,15 @@ from math import sin, cos, radians, hypot, atan2, degrees
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
+# couleurs et taille du canvas
 gris = "#3a3a3a"
 noir = "#111111"
 taille = 300
 centre = taille // 2
 
+# variables qu on va utiliser partout
 matrice = [[None for _ in range(10)] for _ in range(360)]
-vitesse = 5
+vitesse = 20
 angle = 0
 remanents = []
 canvas = None
@@ -19,13 +21,15 @@ fenetre_h = None
 
 
 def changer_vitesse(valeur):
+    """met a jour la vitesse de rotation quand on bouge la jauge
+    plus la jauge est basse plus l helice tourne lentement"""
     global vitesse
     vitesse = int(float(valeur))
-    if vitesse < 1:
-        vitesse = 1
 
 
 def charger():
+    """ouvre une fenetre pour choisir un fichier csv sur l ordinateur
+    et lance le chargement de son contenu"""
     chemin = filedialog.askopenfilename(filetypes=[("CSV", "*.csv")])
     if chemin == "":
         return
@@ -36,60 +40,82 @@ def charger():
 
 
 def charger_depuis_texte(texte):
+    """lit un csv polaire rayon angle etat le convertit en cartesien
+    puis remplit la matrice qui sert a allumer les leds pendant la rotation"""
     global matrice, angle, remanents
-    
-    texte_propre = texte.replace(" ", "\n").strip()
-    
-    points_bruts = []
-    for ligne in texte_propre.split("\n")[1:]:
+
+    texte = texte.replace("\r\n", "\n").replace("\r", "\n")
+
+    lignes = texte.strip().split("\n")
+    premiere = lignes[0].strip().split(";")
+    debut = 0 if len(premiere) >= 4 else 1
+
+    sommets_polaire = []
+    for ligne in lignes[debut:]:
         morceaux = ligne.strip().split(";")
         if len(morceaux) >= 4:
-            x = float(morceaux[1])
-            y = float(morceaux[2])
-            stylo = int(morceaux[3])
-            points_bruts.append((x, y, stylo))
-            
-    if not points_bruts:
+            r = float(morceaux[1])
+            a = float(morceaux[2])
+            stylo_brut = morceaux[3].strip()
+            stylo = int(stylo_brut[0]) if stylo_brut else 0
+            sommets_polaire.append((r, a, stylo))
+
+    if not sommets_polaire:
         return
 
-    tous_les_x = [p[0] for p in points_bruts]
-    tous_les_y = [p[1] for p in points_bruts]
-    centre_x = (min(tous_les_x) + max(tous_les_x)) / 2
-    centre_y = (min(tous_les_y) + max(tous_les_y)) / 2
+    # x = rayon fois cosinus de l angle
+    # y = moins rayon fois sinus de l angle pour remettre le haut en haut
+    cartesien = []
+    for r, a, stylo in sommets_polaire:
+        x = r * cos(radians(a))
+        y = -r * sin(radians(a))
+        cartesien.append((x, y, stylo))
 
-    points_centres = []
-    for x, y, stylo in points_bruts:
-        points_centres.append((x - centre_x, y - centre_y, stylo))
+    xs = [p[0] for p in cartesien]
+    ys = [p[1] for p in cartesien]
+    mx = (max(xs) + min(xs)) / 2
+    my = (max(ys) + min(ys)) / 2
+    pts_centres = [(x - mx, y - my, s) for x, y, s in cartesien]
 
-    points_continus = []
-    for i in range(len(points_centres)):
-        x1, y1, stylo = points_centres[i]
-        if stylo == 1 and i > 0:
-            x0, y0, _ = points_centres[i-1]
-            nb_segments = 50 
-            for j in range(nb_segments + 1):
-                nx = x0 + (j / nb_segments) * (x1 - x0)
-                ny = y0 + (j / nb_segments) * (y1 - y0)
-                points_continus.append((nx, ny))
-        elif stylo == 1 and i == 0:
-            points_continus.append((x1, y1))
+    r_max = max(hypot(x, y) for x, y, s in pts_centres)
+    if r_max == 0:
+        return
 
-    r_max_absolu = max([hypot(x, y) for x, y in points_continus]) if points_continus else 1
+    segments = []
+    for i in range(1, len(pts_centres)):
+        x0, y0, s0 = pts_centres[i - 1]
+        x1, y1, s1 = pts_centres[i]
+        if s1 == 1:
+            segments.append((x0, y0, x1, y1))
+
+    # pour chaque angle possible de la branche on regarde si elle croise
+    # un segment de la forme et a quelle distance du centre
     matrice = [[None for _ in range(10)] for _ in range(360)]
-
-    for x, y in points_continus:
-        r = hypot(x, y)
-        a = (degrees(atan2(y, x)) + 360) % 360
-        angle_deg = int(a % 360)
-        led = min(9, int((r / r_max_absolu) * 9))
-        matrice[angle_deg][led] = (0, 255, 255)
+    for theta in range(360):
+        dx = cos(radians(theta))
+        dy = sin(radians(theta))
+        for ax, ay, bx, by in segments:
+            ex = bx - ax
+            ey = by - ay
+            denom = dx * ey - dy * ex
+            if abs(denom) < 1e-10:
+                continue
+            t = (ax * ey - ay * ex) / denom
+            s = (ax * dy - ay * dx) / denom
+            if t > 0.5 and 0 <= s <= 1:
+                led = min(9, int(t / r_max * 9))
+                matrice[theta][led] = (0, 255, 255)
 
     canvas.delete("all")
     angle = 0
     remanents = []
 
+
 def animer():
+    """fait tourner les quatre branches et allume les leds prevues par la matrice
+    gere aussi l extinction progressive des pixels deja allumes"""
     global angle
+
     for p in remanents[:]:
         p["vie"] = p["vie"] - 25
         if p["vie"] <= 0:
@@ -99,35 +125,44 @@ def animer():
             ratio = p["vie"] / 255.0
             vert = int(255 * ratio)
             canvas.itemconfig(p["id"], fill=f'#00{vert:02x}{vert:02x}')
-            
+
     canvas.delete("branche")
-    
-    for pas in range(vitesse):
+
+    # plus vitesse est grand plus on avance de degres a chaque tour
+    pas = 1 + vitesse // 5
+
+    for indice_pas in range(pas):
         angle = (angle + 1) % 360
-        dernier_pas = (pas == vitesse - 1)
-        
+        dernier_pas = (indice_pas == pas - 1)
+
         for b in range(4):
             angle_branche = (angle + b * 90) % 360
             ar = radians(angle_branche)
-            
+
             if dernier_pas:
                 canvas.create_line(centre, centre,
                                    centre + 130 * cos(ar),
                                    centre + 130 * sin(ar),
                                    fill="#444444", width=2, tags="branche")
-            
+
             for i in range(10):
                 if matrice[angle_branche][i] is not None:
                     r_phys = (i + 1) * 12
                     x = centre + r_phys * cos(ar)
                     y = centre + r_phys * sin(ar)
-                    tid = canvas.create_oval(x-3, y-3, x+3, y+3, fill="cyan", outline="")
+                    tid = canvas.create_oval(x - 3, y - 3, x + 3, y + 3,
+                                            fill="cyan", outline="")
                     remanents.append({"id": tid, "vie": 255})
-                    
-    fenetre_h.after(20, animer)
+
+    delai = int(220 - vitesse * 2)
+    if delai < 5:
+        delai = 5
+    fenetre_h.after(delai, animer)
 
 
 def lancer(root):
+    """construit toute l interface bouton charger canvas et jauge
+    dans la fenetre recue en parametre"""
     global canvas, fenetre_h
 
     fenetre_h = root
@@ -159,9 +194,9 @@ def lancer(root):
     ctk.CTkLabel(barre_bas, text="Vitesse", text_color="#cccccc",
                  font=("Arial", 11)).pack(side="left")
 
-    jauge_vitesse = ctk.CTkSlider(barre_bas, from_=1, to=20,
+    jauge_vitesse = ctk.CTkSlider(barre_bas, from_=1, to=100,
                                    command=changer_vitesse)
-    jauge_vitesse.set(5)
+    jauge_vitesse.set(20)
     jauge_vitesse.pack(side="left", padx=10, fill="x", expand=True)
 
     animer()

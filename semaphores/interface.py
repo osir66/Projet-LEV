@@ -3,9 +3,11 @@ import customtkinter as ctk
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
+# couleurs de la fenetre et du canvas
 gris = "#3a3a3a"
 noir = "#111111"
 
+# variables qu on va utiliser partout
 caractere = "A"
 canvas = None
 fenetre = None
@@ -14,6 +16,7 @@ case_lettre = None
 
 
 def changer_lettre():
+    """recupere le texte tape dans la case et affiche son premier caractere"""
     global caractere
     texte = case_lettre.get()
     if len(texte) > 0:
@@ -23,6 +26,7 @@ def changer_lettre():
 
 
 def changer_lettre_auto(forme, nom_mission=""):
+    """change le caractere affiche automatiquement quand une mission arrive du serveur"""
     global caractere
     if len(forme) > 0:
         caractere = forme[0]
@@ -34,18 +38,21 @@ def changer_lettre_auto(forme, nom_mission=""):
 
 
 def vider():
+    """efface le canvas et le label quand il n y a plus de mission a afficher"""
     canvas.delete("all")
     label_lettre.configure(text="")
 
 
 def dessiner():
+    """affiche le caractere ascii en grand au centre du canvas"""
     canvas.delete("all")
     canvas.create_text(150, 150, text=caractere,
                        fill="white", font=("Courier", 120, "bold"))
 
 
-# boucle qui rafraichit l affichage en verifiant que la fenetre existe encore
 def animer():
+    """boucle qui redessine le caractere toutes les 500 millisecondes
+    elle s arrete proprement si la fenetre a ete fermee"""
     try:
         if fenetre and fenetre.winfo_exists():
             dessiner()
@@ -55,6 +62,7 @@ def animer():
 
 
 def lancer(root):
+    """construit tous les boutons et le canvas dans la fenetre recue en parametre"""
     global canvas, fenetre, label_lettre, case_lettre
 
     fenetre = root

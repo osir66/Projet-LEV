@@ -2,15 +2,18 @@
 # on lit la reponse du serveur sans utiliser le module json
 
 def lire_json(texte):
+    """lit un texte json complet et retourne la valeur python correspondante"""
     texte = texte.strip()
     i = 0
 
     def sauter_espaces():
+        """avance i tant qu il y a des espaces des tabulations ou des retours a la ligne"""
         nonlocal i
         while i < len(texte) and texte[i] in ' \t\n\r':
             i += 1
 
     def lire_valeur():
+        """regarde le caractere actuel et choisit quelle fonction de lecture appeler"""
         nonlocal i
         sauter_espaces()
         c = texte[i]
@@ -31,8 +34,8 @@ def lire_json(texte):
             return None
         return lire_nombre()
 
-    # on lit une chaine entre guillemets
     def lire_chaine():
+        """lit une chaine de caracteres entre guillemets et gere les caracteres echappes"""
         nonlocal i
         i += 1
         res = ""
@@ -44,6 +47,8 @@ def lire_json(texte):
                     res += '\n'
                 elif suivant == 't':
                     res += '\t'
+                elif suivant == 'r':
+                    res += '\r'
                 else:
                     res += suivant
             else:
@@ -52,8 +57,8 @@ def lire_json(texte):
         i += 1
         return res
 
-    # on lit un nombre entier ou decimal
     def lire_nombre():
+        """lit un nombre entier ou decimal et le convertit dans le bon type python"""
         nonlocal i
         debut = i
         while i < len(texte) and texte[i] in '-+.0123456789eE':
@@ -63,8 +68,8 @@ def lire_json(texte):
             return float(morceau)
         return int(morceau)
 
-    # on lit un objet entre accolades
     def lire_objet():
+        """lit un objet entre accolades et construit un dictionnaire cle valeur"""
         nonlocal i
         i += 1
         obj = {}
@@ -86,8 +91,8 @@ def lire_json(texte):
                 break
         return obj
 
-    # on lit une liste entre crochets
     def lire_liste():
+        """lit une liste entre crochets et construit une liste python"""
         nonlocal i
         i += 1
         liste = []
@@ -106,3 +111,7 @@ def lire_json(texte):
         return liste
 
     return lire_valeur()
+
+# parseur.py — l'outil. Une seule responsabilité : transformer le texte JSON du serveur en 
+# données Python utilisables (lire_json). Aucun autre fichier ne fait ça, c'est main.py 
+# qui l'utilise.
