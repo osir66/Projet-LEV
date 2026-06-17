@@ -314,15 +314,15 @@ def list_missions():
         conn.close()
 
 #fonction qui permet d'ajouter une mission 
-def ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time):
+def ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time,color_r,color_g,color_b):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time)
+    print(nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time,color_r,color_g,color_b)
     try :
         c = conn.cursor()
-        c.execute('''INSERT INTO MISSIONS (id, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)''',
-                (nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time))
+        c.execute('''INSERT INTO MISSIONS (id, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time,color_r,color_g,color_b) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)''',
+                (nouvel_uuid, name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time,color_r,color_g,color_b))
     except Error as e:
         print("Erreur : ", e)
         return "Erreur lors de l'ajout de la mission", e 
@@ -332,7 +332,7 @@ def ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_
 
 
 #fonction qui permet de modifier une mission en fonction de l'id
-def modifier_mission(id, name, semaphore_id, robot_id, shape_id, state, start_date, end_date, team, time):
+def modifier_mission(id, name, semaphore_id, robot_id, shape_id, state, start_date, end_date, team, time,color_r,color_g,color_b):
     conn = sqlite3.connect("Massilia.db")
     c = conn.cursor()
     
@@ -366,6 +366,15 @@ def modifier_mission(id, name, semaphore_id, robot_id, shape_id, state, start_da
     if time is not None:
         champs.append("time = ?") 
         valeurs.append(time)
+    if color_r is not None:
+        champs.append("color_r = ?")
+        valeurs.append(color_r)
+    if color_g is not None:
+        champs.append("color_g = ?")
+        valeurs.append(color_g)
+    if color_b is not None:
+        champs.append("color_b = ?")
+        valeurs.append(color_b)
     
     if not champs:
         conn.close()
