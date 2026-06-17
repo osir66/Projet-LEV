@@ -51,16 +51,12 @@ public class interfaceCommande extends VBox {
             String ip = urlBase.getText().trim();
             String portVal = port.getText().trim();
             btnRechercher.setDisable(true);
-            new Thread(() -> {
-                Communication1 comm = new Communication1(ip, portVal);
-                semaphore.charger(comm);
-                forme.charger(comm);
-                Platform.runLater(() -> {
-                    listeSemaphores.getItems().setAll(semaphore.getSemaphores());
-                    listeFormes.getItems().setAll(forme.getFormes());
-                    btnRechercher.setDisable(false);
-                });
-            }).start();
+            Communication1 comm = new Communication1(ip, portVal);
+            semaphore.charger(comm);
+            forme.charger(comm);
+            listeSemaphores.getItems().setAll(semaphore.getSemaphores());
+            listeFormes.getItems().setAll(forme.getFormes());
+            btnRechercher.setDisable(false);
         });
 
         HBox recherche = new HBox(ipeLabel, urlBase, portLabel, port, btnRechercher);
@@ -156,24 +152,20 @@ public class interfaceCommande extends VBox {
             }
             semaphore semSelect = (semaphore) toggleSem.getUserData();
             forme.FormeList formeSelect = (forme.FormeList) toggleForme.getUserData();
-
             String ip = urlBase.getText().trim();
             String portVal = port.getText().trim();
-
-            new Thread(() -> {
-                try {
-                    new Communication1(ip, portVal).envoieMission(
-                            nomMission.getText().trim(),
-                            semSelect.getSemaphore_id(),
-                            Integer.parseInt(temps.getText().isEmpty() ? "0" : temps.getText()),
-                            equipe.getText().trim(),
-                            formeSelect.id()
-                    );
-                    log("Mission \"" + nomMission.getText().trim() + "\" envoyée avec succès.");
-                } catch (Exception ex) {
-                    log("Erreur : " + ex.toString());
-                }
-            }).start();
+            try {
+                new Communication1(ip, portVal).envoieMission(
+                        nomMission.getText().trim(),
+                        semSelect.getSemaphore_id(),
+                        Integer.parseInt(temps.getText().isEmpty() ? "0" : temps.getText()),
+                        equipe.getText().trim(),
+                        formeSelect.id()
+                );
+                log("Mission \"" + nomMission.getText().trim() + "\" envoyée avec succès.");
+            } catch (Exception ex) {
+                log("Erreur : " + ex.toString());
+            }
         });
 
         

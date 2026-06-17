@@ -40,7 +40,7 @@ public class Communication1 {
             int codeReponse = connexion.getResponseCode();
             String reponse = connexion.getResponseMessage();
 
-            if (codeReponse == 200) {
+            if (codeReponse == 200 || codeReponse == 201) {
                 System.out.println("Mission envoyé avec succès");
             } else {
                 System.out.println("Erreur envoie de missions " + codeReponse + " : " + reponse);
@@ -55,7 +55,7 @@ public class Communication1 {
         try {
             String lien = this.urlBase + "list_semaphore";
             System.out.println("Recherche sur : " + lien);
-URL url = new URL(lien);
+            URL url = new URL(lien);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
 
