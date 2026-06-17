@@ -1,13 +1,20 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Simulateur extends Application {
-
-    private static final String URL_SERVEUR = "http://192.168.1.22:8000";
 
     public static void main(String[] args) {
         System.out.println("=========================================");
@@ -19,7 +26,50 @@ public class Simulateur extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Web clientWeb = new Web(URL_SERVEUR);
+        Map<String, String> configurationsServeurs = new HashMap<>();
+        configurationsServeurs.put("Massilia", "http://192.168.1.22:8000");
+        configurationsServeurs.put("Les K-talents", "http://192.168.1.14:8000");
+        configurationsServeurs.put("Comment Bien Manger Une Tourte ?", "http://192.168.1.24:8000");
+        configurationsServeurs.put("Lux sky Trooper", "http://192.168.1.96:8000");
+
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Configuration du Serveur");
+        dialog.setHeaderText("Connexion au serveur de simulation");
+
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        ComboBox<String> comboBoxNom = new ComboBox<>();
+        comboBoxNom.getItems().addAll(configurationsServeurs.keySet());
+        
+        comboBoxNom.setEditable(true); 
+        comboBoxNom.getSelectionModel().selectFirst();
+        comboBoxNom.setPrefWidth(250);
+
+        VBox vbox = new VBox(10);
+        vbox.getChildren().addAll(new Label("Choisissez un profil de serveur :"), comboBoxNom);
+        dialog.getDialogPane().setContent(vbox);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                String choixUtilisateur = comboBoxNom.getValue();
+                
+                return configurationsServeurs.getOrDefault(choixUtilisateur, choixUtilisateur);
+            }
+            return null;
+        });
+
+        Optional<String> result = dialog.showAndWait();
+        
+        if (!result.isPresent()) {
+            System.out.println("Démarrage annulé.");
+            Platform.exit();
+            return;
+        }
+
+        String urlServeur = result.get();
+        System.out.println("-> Connexion établie via l'adresse : " + urlServeur);
+
+        Web clientWeb = new Web(urlServeur);
         Carte carte = new Carte();
 
         try {
@@ -36,7 +86,6 @@ public class Simulateur extends Application {
                     }
                 }
             }
-
             System.out.println("[DEBUG] JSON à analyser : " + jsonConfig);
 
             String nomGrille = extraireValeur(jsonConfig, "grille");
@@ -79,9 +128,9 @@ public class Simulateur extends Application {
             primaryStage.sizeToScene();
             primaryStage.show();
             primaryStage.setResizable(false);
-
+            
         } catch (Exception e) {
-            System.err.println("Erreur fatale lors de l'initialisation : " + e.getMessage());
+            System.err.println("Erreur lors de l'initialisation : " + e.getMessage());
             e.printStackTrace();
         }
     }

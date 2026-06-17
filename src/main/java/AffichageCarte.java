@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 
 public class AffichageCarte extends Canvas {
     private final Carte carte;
-    private static final int TAILLE_CASE = 35; // Distance entre 2 routes (px)
+    private static final int TAILLE_CASE = 35; // distance entre 2 routes (px)
 
     public AffichageCarte(Carte carte, double width, double height) {
         super(width, height);
@@ -17,8 +17,8 @@ public class AffichageCarte extends Canvas {
     }
 
     private double getPixelY(int gridY) {
-        double centerY = getHeight() / 2.0;
-        return centerY + (gridY * TAILLE_CASE);
+        double paddingY = (getHeight() - (carte.getHauteurY() * TAILLE_CASE)) / 2.0;
+        return getHeight() - paddingY - (gridY * TAILLE_CASE);
     }
 
     public void dessiner() {
@@ -26,12 +26,12 @@ public class AffichageCarte extends Canvas {
         gc.clearRect(0, 0, getWidth(), getHeight());
 
         int demiX = carte.getLargeurX() / 2;
-        int demiY = carte.getHauteurY() / 2;
+        int maxY = carte.getHauteurY();
 
         double coordMinX = getPixelX(-demiX);
         double coordMaxX = getPixelX(demiX);
-        double coordMinY = getPixelY(-demiY);
-        double coordMaxY = getPixelY(demiY);
+        double coordMinY = getPixelY(1);
+        double coordMaxY = getPixelY(maxY);
 
         gc.setStroke(Color.LIGHTGRAY);
         gc.setLineWidth(1.5);
@@ -41,7 +41,7 @@ public class AffichageCarte extends Canvas {
             gc.strokeLine(posX, coordMinY, posX, coordMaxY);
         }
 
-        for (int j = -demiY; j <= demiY; j++) {
+        for (int j = 1; j <= maxY; j++) {
             double posY = getPixelY(j);
             gc.strokeLine(coordMinX, posY, coordMaxX, posY);
         }
@@ -49,9 +49,11 @@ public class AffichageCarte extends Canvas {
         double baseX = getPixelX(carte.getBaseX());
         double baseY = getPixelY(carte.getBaseY());
         
+        gc.setStroke(Color.LIGHTGRAY);
+        gc.strokeLine(baseX, baseY, baseX, getPixelY(1));
+
         gc.setFill(Color.DARKGREEN);
         gc.fillOval(baseX - 15, baseY - 15, 30, 30);
-        
         
         gc.setFill(Color.WHITE);
         gc.fillText("BASE", baseX - 14, baseY + 5);

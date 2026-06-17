@@ -1,6 +1,6 @@
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class Robot implements Runnable {
     private String id;
@@ -52,7 +52,7 @@ public class Robot implements Runnable {
                                     
                                     if (this.carte.reserverMission(m.getIdMission())) {
                                         this.missionActuelle = m;
-                                        this.missionActuelle.setDateDebut(Instant.now().toString());
+                                        this.missionActuelle.setDateDebut(LocalDateTime.now().toString());
                                         
                                         System.out.println(String.format("[%s] Mission %s acceptée. Cible: (%d, %d)", 
                                                 this.nom, m.getIdMission(), m.getCibleX(), m.getCibleY()));
@@ -71,15 +71,10 @@ public class Robot implements Runnable {
                 } else if (missionActuelle != null) {
                     avancerVersCible();
                 } else if (retourBase) {
-                    // Retour base
                     int bx = carte.getBaseX();
                     int by = carte.getBaseY();
-                    if (this.x < bx) this.x++;
-                    else if (this.x > bx) this.x--;
-                    else if (this.y < by) this.y++;
-                    else if (this.y > by) this.y--;
-
-                    notifierPosition("Returning");
+                    
+                    Pas(bx, by);
 
                     if (this.x == bx && this.y == by) {
                         retourBase = false;
@@ -93,41 +88,13 @@ public class Robot implements Runnable {
         }
     }
 
-    private void verifierNouvelleMission() {
-        try {
-            String reponseMissions = this.webClient.requeteGet("/api/list_missions");
-            java.util.List<Missions> listeMissionsDuServeur = parserToutesMissions(reponseMissions);
-            
-            for (Missions m : listeMissionsDuServeur) {
-                if (m.getStatut() != null && m.getStatut().equalsIgnoreCase("Awaiting")) {
-                    
-                    if (this.carte.reserverMission(m.getIdMission())) {
-                        this.missionActuelle = m;
-                        this.missionActuelle.setDateDebut(Instant.now().toString());
-                        
-                        System.out.println(String.format("[%s] Mission %s acceptée. Cible: (%d, %d)", 
-                                this.nom, m.getIdMission(), m.getCibleX(), m.getCibleY()));
-                        
-                        changerEtatMission(this.missionActuelle, "Pending_robot");
-                        break;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la vérification des missions (" + this.nom + ") : " + e.getMessage());
-        }
-    }
-
     private void avancerVersCible() throws Exception {
         if (this.missionActuelle == null) return;
 
         int cx = this.missionActuelle.getCibleX();
         int cy = this.missionActuelle.getCibleY();
 
-        if (this.x < cx) this.x++;
-        else if (this.x > cx) this.x--;
-        else if (this.y < cy) this.y++;
-        else if (this.y > cy) this.y--;
+        Pas(cx, cy);
 
         notifierPosition("Occupied");
 
@@ -144,16 +111,36 @@ public class Robot implements Runnable {
         }
     }
 
+    private void Pas(int cibleX, int cibleY) {
+        if (this.x == 0 && this.y == 0) {
+            this.y = 1;
+            return;
+        }
+
+        if (cibleX == 0 && cibleY == 0 && (this.x != 0 || this.y != 1)) {
+            cibleX = 0;
+            cibleY = 1;
+        }
+
+        if (this.x != cibleX) {
+            if (this.x < cibleX) this.x++;
+            else this.x--;
+        } else if (this.y != cibleY) {
+            if (this.y < cibleY) this.y++;
+            else this.y--;
+        }
+    }
+
     private void notifierPosition(String etat) throws Exception {
         String url = String.format("/api/update_robot/%s?state=%s&position_x=%d&position_y=%d",
                 id, URLEncoder.encode(etat, StandardCharsets.UTF_8), x, y);
-        this.webClient.requetePut(url, ""); 
+        this.webClient.requetePut(url, "");
     }
 
     private void allumerSemaphore() {
         try {
             if (missionActuelle != null) {
-                String url = String.format("/api/update_semaphore/%s?state=On&coord_x=%d&coord_y=%d", 
+                String url = String.format("/api/update_semaphore/%s?state=Occupied&coord_x=%d&coord_y=%d", 
                     missionActuelle.getIdSemaphore(),
                     missionActuelle.getCibleX(),
                     missionActuelle.getCibleY()
@@ -167,7 +154,7 @@ public class Robot implements Runnable {
     }
 
     private void changerEtatMission(Missions m, String etat) throws Exception {
-        String dDebut = m.getDateDebut() != null ? m.getDateDebut() : Instant.now().toString();
+        String dDebut = m.getDateDebut() != null ? m.getDateDebut() : LocalDateTime.now().toString();
         
         String url = String.format("/api/update_mission/%s?state=%s&robot_id=%s&start_date=%s",
                 m.getIdMission(), 
@@ -229,8 +216,16 @@ public class Robot implements Runnable {
                 int maxX = this.carte.getLargeurX();
                 int maxY = this.carte.getHauteurY();
 
-                int cx = Math.abs(idSemaphore.hashCode() % maxX); 
-                int cy = Math.abs(idSemaphore.hashCode() % maxY);
+                int cx = this.carte.getSemaphoreX(idSemaphore, Integer.MIN_VALUE);
+                int cy = this.carte.getSemaphoreY(idSemaphore, Integer.MIN_VALUE);
+
+                if (cx == Integer.MIN_VALUE) {
+                    int demiX = maxX / 2;
+                    cx = (Math.abs(idSemaphore.hashCode()) % maxX) - demiX;
+                }
+                if (cy == Integer.MIN_VALUE) {
+                    cy = (Math.abs(idSemaphore.hashCode()) % maxY) + 1;
+                }
     
                 Missions m = new Missions(idMission, idSemaphore, symbole, cx, cy);
                 m.setStatut(status.isEmpty() ? "Awaiting" : status);
