@@ -11,6 +11,12 @@ public class main extends Application {
     @Override
     public void start(Stage stage) {
         TabPane tabPane = new TabPane();
+
+        // Onglet Liste missions — fixe, toujours en premier
+        Tab tabListeMissions = new Tab("Liste missions", new listeMissions());
+        tabListeMissions.setClosable(false);
+        tabPane.getTabs().add(tabListeMissions);
+
         // Onglet + fixe, toujours en dernier
         Tab btnAjouter = new Tab("+");
         btnAjouter.setClosable(false);
