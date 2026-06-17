@@ -26,15 +26,15 @@ def redirect_to_commande():
     html = html.replace("__COUNT_MISSIONS__",   str(stats["missions"]))
     return HTMLResponse(content=html)
 
-#@app.get("/mattieux", tags=["Interface"])
-#def mattieux_page():
-#   with open("airbus.html", "r", encoding="utf-8") as f:
-#        html = f.read()
-#    html = html.replace("__COUNT_ROBOTS__",     str(db.count_robots()))
-#    html = html.replace("__COUNT_SEMAPHORES__", str(db.count_semaphores()))
-#    html = html.replace("__COUNT_FORMES__",     str(db.count_formes()))
-#    html = html.replace("__COUNT_MISSIONS__",   str(db.count_missions()))
-#    return HTMLResponse(content=html)
+@app.get("/mattieux", tags=["Interface"])
+def mattieux_page():
+   with open("airbus.html", "r", encoding="utf-8") as f:    
+    html = f.read()
+    html = html.replace("__COUNT_ROBOTS__",     str(db.count_robots()))
+    html = html.replace("__COUNT_SEMAPHORES__", str(db.count_semaphores()))
+    html = html.replace("__COUNT_FORMES__",     str(db.count_formes()))
+    html = html.replace("__COUNT_MISSIONS__",   str(db.count_missions()))
+    return HTMLResponse(content=html)
 
 #-----------------------------------------------------------------------------------
 
@@ -58,10 +58,10 @@ def add_semaphore(name: str = Form(...),type: str= Form(...),coord_x : int= Form
 #route pour modifier un sémaphore en fonction de l'id
 @app.put("/api/update_semaphore/{id}", tags=["Sémaphores"])
 def update_semaphore(id: str, name: str | None = None, state: str | None = None,
-                           duration: int | None = None, type: str | None = None,
+                            type: str | None = None,
                            coord_x : int| None = None,
                            coord_y : int | None = None):
-    return db.update_semaphore(id, name, duration, state, type,coord_x,coord_y)
+    return db.update_semaphore(id, name, state, type,coord_x,coord_y)
 
 #-----------------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ def update_robot(id: str, name: str | None = None, state: str | None = None, spe
 
 #route pour afficher les missions d'un équipe 
 @app.get("/api/list_missions_by_team", tags=["Missions"])
-def get_missions(team : str):
+def get_missions(team : str =""):
     return db.get_mission(team)
 
 #route pour lister les missions 
@@ -155,14 +155,14 @@ def list_formes():
     return db.list_formes()
 
 #route pour afficher la forme en fonction de son id 
-@app.post("/api/shapes/{id}", tags=["Formes"])
+@app.get("/api/shape/{id}", tags=["Formes"])
 def get_shape(id: str):
     return db.get_shape(id)
 
 #route pour ajouter une forme 
 @app.post("/api/add_shape", tags=["Formes"])
-def add_shape(name: str = Form(...), image: str = Form(...)):
-    return db.ajouter_forme(name, image)
+def add_shape(name: str = Form(...),image: str = Form(...)):
+    return db.ajouter_forme(name,image)
 
 #route pour modifier une forme en fonction de l'id
 @app.put("/update_shape/{id}", tags = ["Formes"])

@@ -60,8 +60,8 @@ def table():
         c.execute('''CREATE TABLE IF NOT EXISTS CONFIG (
             id             INTEGER PRIMARY KEY CHECK (id = 1),
             grille         TEXT NOT NULL,
-            nbr_semaphore  INTEGER NOT NULL,
-            nbr_robot      INTEGER NOT NULL,
+            nombre_semaphore  INTEGER NOT NULL,
+            nombre_robot      INTEGER NOT NULL,
             nombre_x       INTEGER NOT NULL, 
             nombre_y       INTEGER NOT NULL
         )''')
@@ -83,10 +83,3 @@ def table():
         conn.close()
 
 #table()
-
-
-
-
-
-
-

@@ -17,6 +17,20 @@ public class interfaceCommande extends VBox {
     ListView<forme.FormeList> listeFormes;
     ToggleGroup groupFormes;
 
+    // Console partagée entre tous les onglets
+    private static final TextArea console = new TextArea();
+    static {
+        console.setEditable(false);
+        console.setPrefHeight(100);
+        console.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 11px;");
+    }
+
+    public static void log(String msg) {
+        Platform.runLater(() -> {
+            console.appendText(msg + "\n");
+        });
+    }
+
     public interfaceCommande() {
         this.getStylesheets().add(
                 getClass().getResource("/style.css").toExternalForm());
@@ -137,7 +151,7 @@ public class interfaceCommande extends VBox {
             Toggle toggleSem = groupSemaphores.getSelectedToggle();
             Toggle toggleForme = groupFormes.getSelectedToggle();
             if (toggleSem == null || toggleForme == null) {
-                System.out.println("Sélectionnez un sémaphore et une forme.");
+                log("Sélectionnez un sémaphore et une forme.");
                 return;
             }
             semaphore semSelect = (semaphore) toggleSem.getUserData();
@@ -155,13 +169,18 @@ public class interfaceCommande extends VBox {
                             equipe.getText().trim(),
                             formeSelect.id()
                     );
+                    log("Mission \"" + nomMission.getText().trim() + "\" envoyée avec succès.");
                 } catch (Exception ex) {
-                    System.out.println("Erreur : " + ex.toString());
+                    log("Erreur : " + ex.toString());
                 }
             }).start();
         });
 
         
+        // Console de log partagée
+        Label consoleLabel = new Label("Logs :");
+        VBox consoleBox = new VBox(3, consoleLabel, console);
+
         this.getChildren().addAll(
                 titre,
                 recherche,
@@ -169,7 +188,8 @@ public class interfaceCommande extends VBox {
                 listes,
                 hboxtemps,
                 hboxEquipe,
-                hboxEnvoyer
+                hboxEnvoyer,
+                consoleBox
         );
         this.setSpacing(10);
     }

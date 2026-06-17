@@ -13,8 +13,7 @@ def list_semaphore():
     c = conn.cursor()
     try :
         c.execute('''SELECT * FROM SEMAPHORES''')
-        afficher_semaphore = [dict(row) for row in c.fetchall()] #convertit chaque ligne retournées par la requete en dictionnaire Python
-        print (afficher_semaphore)
+        afficher_semaphore = [dict(row) for row in c.fetchall()]
         return afficher_semaphore
     except Error as e:
         print("Erreur:",e)
@@ -31,8 +30,8 @@ def get_semaphore(id):
     c = conn.cursor()
     try :
         c.execute('''SELECT * FROM SEMAPHORES WHERE id = ?''', (id,))
-        afficher_semaphore = [dict(row) for row in c.fetchall()] #convertit chaque ligne retournées par la requete en dictionnaire Python
-        return afficher_semaphore
+        row = c.fetchone()
+        return dict(row) if row else None
     except Error as e:
         print("Erreur:", e)
         return "Erreur de l'affichage du semaphore","de l'id :",id, e
@@ -107,7 +106,7 @@ def list_robots():
     c = conn.cursor()
     try :
         c.execute('''SELECT * FROM ROBOTS''')
-        afficher_robot = [dict(row) for row in c.fetchall()]   #convertit chaque ligne retournées par la requete en dictionnaire Python
+        afficher_robot = [dict(row) for row in c.fetchall()]
         return afficher_robot
     except Error as e:
         print("Erreur:", e)
@@ -124,8 +123,8 @@ def get_robot(id):
     c = conn.cursor()
     try :
         c.execute('''SELECT * FROM ROBOTS WHERE id = ?''', (id,))
-        afficher_robot = [dict(row) for row in c.fetchall()]        #convertit chaque ligne retournées par la requete en dictionnaire Python
-        return afficher_robot
+        row = c.fetchone()
+        return dict(row) if row else None
     except Error as e:
         print("Erreur:", e)
         return "Erreur de l'affichage du robot","de l'id :",id, e
@@ -141,8 +140,8 @@ def get_robot_mission(id):
     c = conn.cursor()
     try :
         c.execute('''SELECT * FROM MISSION WHERE id_robot = ?''', (id,))
-        afficher_robot_mission = [dict(row) for row in c.fetchall()]        #convertit chaque ligne retournées par la requete en dictionnaire Python
-        return afficher_robot_mission
+        row = c.fetchone()
+        return dict(row) if row else None
     except Error as e:
         print("Erreur:", e)
         return "Erreur", e
@@ -218,6 +217,7 @@ def list_equipes():
     c = conn.cursor()
     try :
         c.execute('''SELECT * FROM TEAMS''')
+        row = c.fetchone()
         afficher_equipe = [dict(row) for row in c.fetchall()]
         return afficher_equipe
     except Error as e:
@@ -288,8 +288,8 @@ def get_mission(team):
     c = conn.cursor()
     try : 
         c.execute('''SELECT * FROM MISSIONS WHERE team = ?''', (team,))
-        afficher_mission_equipe = [dict(row) for row in c.fetchall()]
-        return afficher_mission_equipe
+        afficher_mis_equipe = [dict(row) for row in c.fetchall()]
+        return afficher_mis_equipe
     except Error as e:
         print("Erreur:", e)
         return "Erreur de l'affichage de la mission missions", e
@@ -304,8 +304,8 @@ def list_missions():
     c = conn.cursor()
     try :
         c.execute('''SELECT * FROM MISSIONS''')
-        afficher_mission = [dict(row) for row in c.fetchall()]
-        return afficher_mission
+        afficher_missions = [dict(row) for row in c.fetchall()]
+        return afficher_missions
     except Error as e:
         print("Erreur:", e)
         return "Erreur de l'affichage des missions", e
@@ -425,8 +425,8 @@ def get_shape(id):
     c = conn.cursor()
     try :
         c.execute('''SELECT * FROM SHAPES WHERE id = ?''', (id,))
-        afficher_forme = [dict(row) for row in c.fetchall()]
-        return afficher_forme
+        row = c.fetchone()
+        return dict(row) if row else None
     except Error as e:
         print("Erreur:", e)
         return "Erreur de l'affichage de la forme","de l'id :",id, e
@@ -435,14 +435,14 @@ def get_shape(id):
         conn.close()
         
 #fonction qui permet d'ajouter une forme  
-def ajouter_forme(name, image):
+def ajouter_forme(name,image):
     conn = sqlite3.connect("Massilia.db")
     nouvel_uuid = str(uuid.uuid4())
-    print(nouvel_uuid, name, image)
+    print(nouvel_uuid, name,image)
     try :
         c = conn.cursor()
-        c.execute('''INSERT INTO SHAPES (id, name, image) VALUES (?, ?, ?)''',
-              (nouvel_uuid, name, image))
+        c.execute('''INSERT INTO SHAPES (id, name,image) VALUES (?, ?,?)''',
+              (nouvel_uuid, name,image))
     except Error as e:
         print("Erreur:", e)
         return "Erreur lors de l'ajout de la forme", e 
@@ -518,7 +518,7 @@ def add_config(grille,nbr_semaphore,nbr_robot,nb_x,nb_y):
     print(grille,nbr_semaphore,nbr_robot,nb_x,nb_y)
     try :
         c = conn.cursor()
-        c.execute('''REPLACE INTO CONFIG (id,grille,nbr_semaphore,nbr_robot,nombre_x,nombre_y) VALUES (1,?, ?,?,?,?)''',
+        c.execute('''REPLACE INTO CONFIG (id,grille,nombre_semaphore,nombre_robot,nombre_x,nombre_y) VALUES (1,?, ?,?,?,?)''',
               (grille,nbr_semaphore,nbr_robot,nb_x,nb_y))
     except Error as e:
         print("Erreur:",e)
