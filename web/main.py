@@ -100,7 +100,7 @@ def update_robot(id: str, name: str | None = None, state: str | None = None, spe
 
 #route pour afficher les missions d'un équipe 
 @app.get("/api/list_missions_by_team", tags=["Missions"])
-def get_missions(team : str):
+def get_missions(team : str =""):
     return db.get_mission(team)
 
 #route pour lister les missions 

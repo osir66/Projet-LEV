@@ -83,6 +83,3 @@ def table():
         conn.close()
 
 #table()
-
-
-    

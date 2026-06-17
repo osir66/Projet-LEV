@@ -288,8 +288,8 @@ def get_mission(team):
     c = conn.cursor()
     try : 
         c.execute('''SELECT * FROM MISSIONS WHERE team = ?''', (team,))
-        row = c.fetchone()
-        return dict(row) if row else None
+        afficher_mis_equipe = [dict(row) for row in c.fetchall()]
+        return afficher_mis_equipe
     except Error as e:
         print("Erreur:", e)
         return "Erreur de l'affichage de la mission missions", e
