@@ -23,9 +23,10 @@ public class Robot implements Runnable {
         this.retourBase = false;
     }
 
-    public String getNom() {
-    return nom;
-}
+    public String getNom() { return nom; }
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public Missions getMissionActuelle() { return missionActuelle; }
 
     public void setIdServeur(String idServeur) {
         this.id = idServeur;
