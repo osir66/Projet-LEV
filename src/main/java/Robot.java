@@ -81,7 +81,7 @@ public class Robot implements Runnable {
                         System.out.println(String.format("[%s] De retour à la base et disponible.", this.nom));
                     }
                 }
-                Thread.sleep(1000); // 1 pas/seconde
+                Thread.sleep(1000); // 1 pas/secondes
             } catch (Exception e) {
                 System.err.println("Erreur boucle robot (" + nom + ") : " + e.getMessage());
             }
@@ -112,23 +112,32 @@ public class Robot implements Runnable {
     }
 
     private void Pas(int cibleX, int cibleY) {
+        int tempCibleX = cibleX;
+        int tempCibleY = cibleY;
+
         if (this.x == 0 && this.y == 0) {
-            this.y = 1;
-            return;
+            tempCibleX = 0;
+            tempCibleY = 1;
+        } else if (cibleX == 0 && cibleY == 0 && (this.x != 0 || this.y != 1)) {
+            tempCibleX = 0;
+            tempCibleY = 1;
         }
 
-        if (cibleX == 0 && cibleY == 0 && (this.x != 0 || this.y != 1)) {
-            cibleX = 0;
-            cibleY = 1;
+        int prochainX = this.x;
+        int prochainY = this.y;
+
+        if (this.x != tempCibleX) {
+            prochainX = (this.x < tempCibleX) ? this.x + 1 : this.x - 1;
+        } else if (this.y != tempCibleY) {
+            prochainY = (this.y < tempCibleY) ? this.y + 1 : this.y - 1;
+        } else {
+            return; 
         }
 
-        if (this.x != cibleX) {
-            if (this.x < cibleX) this.x++;
-            else this.x--;
-        } else if (this.y != cibleY) {
-            if (this.y < cibleY) this.y++;
-            else this.y--;
-        }
+        if (this.carte.demanderDeplacement(this.x, this.y, prochainX, prochainY)) {
+            this.x = prochainX;
+            this.y = prochainY;
+        } 
     }
 
     private void notifierPosition(String etat) throws Exception {

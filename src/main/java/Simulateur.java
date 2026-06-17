@@ -27,10 +27,10 @@ public class Simulateur extends Application {
     @Override
     public void start(Stage primaryStage) {
         Map<String, String> configurationsServeurs = new HashMap<>();
-        configurationsServeurs.put("Massilia", "http://192.168.1.22:8000");
-        configurationsServeurs.put("Les K-talents", "http://192.168.1.14:8000");
-        configurationsServeurs.put("Comment Bien Manger Une Tourte ?", "http://192.168.1.24:8000");
-        configurationsServeurs.put("Lux sky Trooper", "http://192.168.1.96:8000");
+        configurationsServeurs.put("Massilia (http://192.168.1.22:8000)", "http://192.168.1.22:8000");
+        configurationsServeurs.put("Les K-talents (http://192.168.1.14:8000)", "http://192.168.1.14:8000");
+        configurationsServeurs.put("Comment Bien Manger Une Tourte ? (http://192.168.1.24:8000)", "http://192.168.1.24:8000");
+        configurationsServeurs.put("Lux sky Trooper (http://192.168.1.96:8000)", "http://192.168.1.96:8000");
 
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Configuration du Serveur");
@@ -46,7 +46,7 @@ public class Simulateur extends Application {
         comboBoxNom.setPrefWidth(250);
 
         VBox vbox = new VBox(10);
-        vbox.getChildren().addAll(new Label("Choisissez un profil de serveur :"), comboBoxNom);
+        vbox.getChildren().addAll(new Label("Choisissez l'adresse du serveur :"), comboBoxNom);
         dialog.getDialogPane().setContent(vbox);
 
         dialog.setResultConverter(dialogButton -> {
@@ -100,7 +100,7 @@ public class Simulateur extends Application {
                 carte.setConfiguration(nom, tailleX, tailleY);
                 System.out.println(String.format("   [OK] Grille '%s' configurée en %dx%d", nom, tailleX, tailleY));
             } else {
-                System.out.println("   [Avertissement] Échec d'extraction. Utilisation du fallback (15x15).");
+                System.out.println("   [Avertissement] Échec de l'extraction. Utilisation du fallback (15x15).");
             }
 
             try {
@@ -110,7 +110,7 @@ public class Simulateur extends Application {
                 System.err.println("   [Erreur Sémaphores] " + e.getMessage());
             }
 
-            System.out.println("\n-> Récupération des robots depuis le serveur...");
+            System.out.println("-> Récupération des robots depuis le serveur...");
             String reponseRobots = clientWeb.requeteGet("/api/list_robots");
             List<Robot> robotsDuServeur = parserRobotsServeur(reponseRobots, carte, clientWeb);
             

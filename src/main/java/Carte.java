@@ -9,6 +9,8 @@ public class Carte {
     private List<Robot> listeRobots;
     private Set<String> missionsEnCours;
     private Map<String, int[]> positionsSemaphores; 
+    
+    private Set<String> positionsOccupees;
 
     private String nomGrille = "Defaut";
     private int largeurX = 15;
@@ -21,6 +23,30 @@ public class Carte {
         this.listeRobots = new ArrayList<>();
         this.missionsEnCours = new HashSet<>();
         this.positionsSemaphores = new HashMap<>();
+        this.positionsOccupees = new HashSet<>();
+    }
+
+    public synchronized boolean demanderDeplacement(int xActuel, int yActuel, int xCible, int yCible) {
+        String cleCible = xCible + "," + yCible;
+        String cleActuelle = xActuel + "," + yActuel;
+
+        if (xCible == 0 && yCible == 0) {
+            if (!(xActuel == 0 && yActuel == 0)) {
+                positionsOccupees.remove(cleActuelle);
+            }
+            return true;
+        }
+
+        if (positionsOccupees.contains(cleCible)) {
+            return false;
+        }
+
+        if (!(xActuel == 0 && yActuel == 0)) {
+            positionsOccupees.remove(cleActuelle); 
+        }
+        positionsOccupees.add(cleCible);
+        
+        return true;
     }
 
     public synchronized void ajouterPositionSemaphore(String id, int x, int y) {
@@ -58,7 +84,7 @@ public class Carte {
     public String getNomGrille() { 
         return nomGrille; 
     }
-
+    
     public synchronized void ajouterRobot(Robot r) { 
         listeRobots.add(r); 
     }
