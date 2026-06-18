@@ -111,8 +111,8 @@ def list_missions():
 #route pour ajouter une mission 
 @app.post("/api/add_mission", tags=["Missions"])
 def add_mission(name : str | None = None, semaphore_id : str| None = None , robot_id : str | None = None, shape_id: str | None = None , team_id : str | None = None ,state : str ="Awaiting",
-                start_date : str ="", end_date : str = "",team : str ="", time : int = ""):    
-    return db.ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time)
+                start_date : str ="", end_date : str = "",team : str ="", time : int = "",color_r : int | None = None, color_g : int | None = None, color_b : int | None = None):    
+    return db.ajouter_mission(name, semaphore_id, robot_id,shape_id, team_id,state, start_date, end_date,team, time,color_r,color_g,color_b)
  
 #route pour modifier une mission en fonction de l'id
 @app.put("/api/update_mission/{id}", tags=["Missions"])
@@ -120,8 +120,8 @@ def update_mission(id: str, name: str | None = None, semaphore_id: str | None = 
                          robot_id: str | None = None, shape_id: str | None = None,
                          state: str | None = None, start_date: str | None = None,
                          end_date: str | None = None, team: str | None = None,
-                         time: str | None = None):
-    return db.modifier_mission(id,name,semaphore_id,robot_id,shape_id,state,start_date,end_date,team,time)
+                         time: str | None = None,color_r : int | None = None, color_g : int | None = None, color_b : int | None = None):
+    return db.modifier_mission(id,name,semaphore_id,robot_id,shape_id,state,start_date,end_date,team,time,color_r,color_g,color_b)
 
 #-----------------------------------------------------------------------------------
 
@@ -180,10 +180,8 @@ async def import_shape_csv(file: UploadFile = File(...)):
     fichier_contenu = await file.read()
     c.write_bytes(fichier_contenu)
     
-    resultat = db.import_csv(str(c))
-    if resultat is None:
-        return "fichier introuvable "
-    return resultat
+    db.import_csv(str(c))
+    return RedirectResponse(url="/commande", status_code=303)
 
 #-----------------------------------------------------------------------------------
 

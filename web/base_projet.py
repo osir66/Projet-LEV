@@ -44,6 +44,9 @@ def table():
                         end_date TEXT,
                         team TEXT,
                         time TEXT,
+                        color_r INTEGER,
+                        color_g INTEGER,
+                        color_b INTEGER,
                         FOREIGN KEY (semaphore_id) REFERENCES semaphores(id),
                         FOREIGN KEY (robot_id) REFERENCES robots(id),
                         FOREIGN KEY (shape_id) REFERENCES shape(id),
@@ -81,5 +84,7 @@ def table():
         print("Erreur lors de la création des tables : ", e)
     finally:
         conn.close()
+
+
 
 #table()

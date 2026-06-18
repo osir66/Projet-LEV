@@ -20,14 +20,19 @@ public class Communication1 {
     }
 
     // LES MÉTHODES
-    public void envoieMission(String name, String semaphore_id, int time, String team, String shape_id) {
+    public void envoieMission(String name, String semaphore_id, int time, String team, String shape_id,
+                              String start_date, int color_r, int color_g, int color_b) {
         try {
             String adresse = this.urlBase + "add_mission" +
                     "?name=" + URLEncoder.encode(name, StandardCharsets.UTF_8) +
                     "&semaphore_id=" + URLEncoder.encode(semaphore_id, StandardCharsets.UTF_8) +
                     "&time=" + time +
                     "&team=" + URLEncoder.encode(team, StandardCharsets.UTF_8) +
-                    "&shape_id=" + URLEncoder.encode(shape_id, StandardCharsets.UTF_8);
+                    "&shape_id=" + URLEncoder.encode(shape_id, StandardCharsets.UTF_8) +
+                    "&start_date=" + URLEncoder.encode(start_date, StandardCharsets.UTF_8) +
+                    "&color_r=" + color_r +
+                    "&color_g=" + color_g +
+                    "&color_b=" + color_b;
 
             System.out.println("Envoi vers " + adresse);
 
