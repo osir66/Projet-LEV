@@ -2,6 +2,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
+/**
+Représente un robot autonome.
+Implémente l'interface Runnable pour pouvoir être exécuté dans un Thread séparé.
+**/
 public class Robot implements Runnable {
     private String id;
     private String nom;
@@ -29,6 +33,9 @@ public class Robot implements Runnable {
     public Missions getMissionActuelle() { return this.missionActuelle; }
     public void setIdServeur(String idServeur) { this.id = idServeur; }
 
+    /**
+    La boucle principale du robot (exécutée par le Thread).
+    **/
     @Override
     public void run() {
         try {
@@ -37,11 +44,14 @@ public class Robot implements Runnable {
             System.err.println("Erreur notification initiale (" + nom + ") : " + e.getMessage());
         }
 
+        // Le robot boucle indéfiniment tant qu'il est actif
         while (actif) {
             try {
+                // Le robot est inactif à la base et cherche une mission
                 if (missionActuelle == null && !retourBase) {
                     notifierPosition("Available");
                     
+                    // On verrouille la carte pour chercher les missions
                     synchronized (carte) {
                         try {
                             String reponseMissions = this.webClient.requeteGet("/api/list_missions");
@@ -50,6 +60,7 @@ public class Robot implements Runnable {
                             for (Missions m : listeMissionsDuServeur) {
                                 if (m.getStatut() != null && m.getStatut().equalsIgnoreCase("Awaiting")) {
                                     
+                                    // Tente de réserver la mission
                                     if (this.carte.reserverMission(m.getIdMission())) {
                                         this.missionActuelle = m;
                                         this.missionActuelle.setDateDebut(LocalDateTime.now().toString());
@@ -57,9 +68,9 @@ public class Robot implements Runnable {
                                         System.out.println(String.format("[%s] Mission %s acceptée. Cible: (%d, %d)", 
                                                 this.nom, m.getIdMission(), m.getCibleX(), m.getCibleY()));
                                         
+                                        // Avertit le serveur que la mission est prise
                                         changerEtatMission(this.missionActuelle, "Pending_robot");
-                                        
-                                        break; 
+                                        break; // Sort de la boucle, le robot a trouvé une mission
                                     }
                                 }
                             }
@@ -68,53 +79,68 @@ public class Robot implements Runnable {
                         }
                     }
 
+                // Le robot a une mission et se dirige vers la cible
                 } else if (missionActuelle != null) {
                     avancerVersCible();
+
+                // La mission est finie, le robot rentre à la base
                 } else if (retourBase) {
                     int bx = carte.getBaseX();
                     int by = carte.getBaseY();
                     
-                    Pas(bx, by);
+                    faireUnPasVers(bx, by);
+                    notifierPosition("Returning");
 
+                    // Si le robot a atteint les coordonnées de la base (0,0)
                     if (this.x == bx && this.y == by) {
                         retourBase = false;
                         System.out.println(String.format("[%s] De retour à la base et disponible.", this.nom));
                     }
                 }
-                Thread.sleep(1000); // 1 pas/secondes
+                
+                // Le robot attend avant de faire le prochain pas
+                Thread.sleep(1000); // 1 pas/seconde
+                
             } catch (Exception e) {
                 System.err.println("Erreur boucle robot (" + nom + ") : " + e.getMessage());
             }
         }
     }
 
+    /**
+    Gère la progression vers la cible et la complétion de la mission.
+    **/
     private void avancerVersCible() throws Exception {
         if (this.missionActuelle == null) return;
 
         int cx = this.missionActuelle.getCibleX();
         int cy = this.missionActuelle.getCibleY();
 
-        Pas(cx, cy);
-
+        faireUnPasVers(cx, cy);
         notifierPosition("Occupied");
 
+        // Si le robot est arrivé sur le sémaphore
         if (this.x == cx && this.y == cy) {
             System.out.println(String.format("[%s] Mission %s complétée !", this.nom, this.missionActuelle.getIdMission()));
             
             allumerSemaphore();
-            
             changerEtatMission(this.missionActuelle, "Pending_semaphore");
             
+            // Libère la mission pour que la mémoire de la carte ne sature pas
             this.carte.libererMission(this.missionActuelle.getIdMission());
             this.missionActuelle = null;
-            this.retourBase = true;
+            this.retourBase = true; // Déclenche le processus de retour
         }
     }
 
-    private void Pas(int cibleX, int cibleY) {
+    /**
+    Déplacement orthogonal avec gestion du point de transit (0,1) et des collisions.
+    **/
+    private void faireUnPasVers(int cibleX, int cibleY) {
         int tempCibleX = cibleX;
         int tempCibleY = cibleY;
 
+        // Gestion du point de transit : on ne sort ou on ne rentre à la base (0,0) que par la case (0,1)
         if (this.x == 0 && this.y == 0) {
             tempCibleX = 0;
             tempCibleY = 1;
@@ -123,6 +149,7 @@ public class Robot implements Runnable {
             tempCibleY = 1;
         }
 
+        // Calcul de la case idéale selon la distance
         int prochainX = this.x;
         int prochainY = this.y;
 
@@ -131,25 +158,29 @@ public class Robot implements Runnable {
         } else if (this.y != tempCibleY) {
             prochainY = (this.y < tempCibleY) ? this.y + 1 : this.y - 1;
         } else {
-            return; 
+            return; // Déjà sur la cible
         }
 
+        // Demande l'autorisation à la carte (système de collisions)
+        // Si true : met à jour les coordonnées. Si false : le robot est bloqué sur place.
         if (this.carte.demanderDeplacement(this.x, this.y, prochainX, prochainY)) {
             this.x = prochainX;
             this.y = prochainY;
-        } 
+        }
     }
+
+    // Méthodes réseau pour informer le serveur
 
     private void notifierPosition(String etat) throws Exception {
         String url = String.format("/api/update_robot/%s?state=%s&position_x=%d&position_y=%d",
                 id, URLEncoder.encode(etat, StandardCharsets.UTF_8), x, y);
-        this.webClient.requetePut(url, "");
+        this.webClient.requetePut(url, ""); 
     }
 
     private void allumerSemaphore() {
         try {
             if (missionActuelle != null) {
-                String url = String.format("/api/update_semaphore/%s?state=Occupied&coord_x=%d&coord_y=%d", 
+                String url = String.format("/api/update_semaphore/%s?state=On&coord_x=%d&coord_y=%d", 
                     missionActuelle.getIdSemaphore(),
                     missionActuelle.getCibleX(),
                     missionActuelle.getCibleY()
@@ -173,6 +204,8 @@ public class Robot implements Runnable {
                 
         this.webClient.requetePut(url, ""); 
     }
+
+    // Parsing JSON "simple"
 
     private String extraireValeur(String json, String key) {
         int keyIndex = json.indexOf("\"" + key + "\"");
@@ -225,11 +258,14 @@ public class Robot implements Runnable {
                 int maxX = this.carte.getLargeurX();
                 int maxY = this.carte.getHauteurY();
 
+                // Récupération des coordonnées du sémaphore stockées dans la carte
                 int cx = this.carte.getSemaphoreX(idSemaphore, Integer.MIN_VALUE);
                 int cy = this.carte.getSemaphoreY(idSemaphore, Integer.MIN_VALUE);
 
+                // Fallback si le sémaphore n'est pas trouvé dans la carte
                 if (cx == Integer.MIN_VALUE) {
                     int demiX = maxX / 2;
+                    // Permet d'avoir des coordonnées négatives à gauche
                     cx = (Math.abs(idSemaphore.hashCode()) % maxX) - demiX;
                 }
                 if (cy == Integer.MIN_VALUE) {

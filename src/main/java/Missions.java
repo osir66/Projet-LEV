@@ -1,12 +1,12 @@
+// Représente une mission que le serveur propose et qu'un robot peut accepter.
 public class Missions {
     private String idMission;
     private String idSemaphore;
     private String symbole;
     private boolean termine;
-    private int cibleX, cibleY;
+    private int cibleX, cibleY; // Coordonnées du sémaphore cible
     private String dateDebut;
-    
-    private String statut; 
+    private String statut; // État de la mission
 
     public Missions(String idMission, String idSemaphore, String symbole, int cibleX, int cibleY) {
         this.idMission = idMission;
@@ -18,16 +18,17 @@ public class Missions {
         this.statut = "Awaiting";
     }
 
-    public String getIdMission() {
-        return idMission;
+    // Getters et Setters
+    public String getIdMission() { 
+        return idMission; 
     }
 
-    public String getIdSemaphore() {
-        return idSemaphore;
+    public String getIdSemaphore() { 
+        return idSemaphore; 
     }
 
-    public String getSymbole() {
-        return symbole;
+    public String getSymbole() { 
+        return symbole; 
     }
 
     public int getCibleX() { 
@@ -38,27 +39,27 @@ public class Missions {
         return cibleY; 
     }
 
-    public boolean isTermine() {
-        return termine;
+    public boolean isTermine() { 
+        return termine; 
     }
 
     public String getDateDebut() { 
-        return dateDebut;
+        return dateDebut; 
     }
-    
-    public void setDateDebut(String dateDebut) {
-        this.dateDebut = dateDebut;
+
+    public void setDateDebut(String dateDebut) { 
+        this.dateDebut = dateDebut; 
     }
 
     public void setTermine(boolean termine) { 
         this.termine = termine; 
     }
 
-    public String getStatut() {
-        return this.statut;
+    public String getStatut() { 
+        return this.statut; 
     }
 
-    public void setStatut(String statut) {
-        this.statut = statut;
+    public void setStatut(String statut) { 
+        this.statut = statut; 
     }
 }
