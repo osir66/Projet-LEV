@@ -18,6 +18,14 @@ angle = 0
 remanents = []
 canvas = None
 fenetre_h = None
+# couleur des leds, modifiee par le controleur via changer_couleur
+couleur = (0, 255, 255)
+
+
+def changer_couleur(r, g, b):
+    """change la couleur des leds affichees selon ce que le controleur a choisi"""
+    global couleur
+    couleur = (r, g, b)
 
 
 def changer_vitesse(valeur):
@@ -104,7 +112,8 @@ def charger_depuis_texte(texte):
             s = (ax * dy - ay * dx) / denom
             if t > 0.5 and 0 <= s <= 1:
                 led = min(9, int(t / r_max * 9))
-                matrice[theta][led] = (0, 255, 255)
+                # on utilise la couleur choisie par le controleur
+                matrice[theta][led] = couleur
 
     canvas.delete("all")
     angle = 0
@@ -116,6 +125,7 @@ def animer():
     gere aussi l extinction progressive des pixels deja allumes"""
     global angle
 
+    # les pixels deja allumes s eteignent petit a petit
     for p in remanents[:]:
         p["vie"] = p["vie"] - 25
         if p["vie"] <= 0:
@@ -123,8 +133,10 @@ def animer():
             remanents.remove(p)
         else:
             ratio = p["vie"] / 255.0
-            vert = int(255 * ratio)
-            canvas.itemconfig(p["id"], fill=f'#00{vert:02x}{vert:02x}')
+            r = int(p["r"] * ratio)
+            g = int(p["g"] * ratio)
+            b = int(p["b"] * ratio)
+            canvas.itemconfig(p["id"], fill=f'#{r:02x}{g:02x}{b:02x}')
 
     canvas.delete("branche")
 
@@ -147,12 +159,17 @@ def animer():
 
             for i in range(10):
                 if matrice[angle_branche][i] is not None:
+                    # on allume la led avec sa couleur, en partant
+                    # du centre vers l exterieur de la branche
                     r_phys = (i + 1) * 12
                     x = centre + r_phys * cos(ar)
                     y = centre + r_phys * sin(ar)
+                    cr, cg, cb = matrice[angle_branche][i]
+                    hex_couleur = f'#{cr:02x}{cg:02x}{cb:02x}'
                     tid = canvas.create_oval(x - 3, y - 3, x + 3, y + 3,
-                                            fill="cyan", outline="")
-                    remanents.append({"id": tid, "vie": 255})
+                                            fill=hex_couleur, outline="")
+                    remanents.append({"id": tid, "vie": 255,
+                                      "r": cr, "g": cg, "b": cb})
 
     delai = int(220 - vitesse * 2)
     if delai < 5:

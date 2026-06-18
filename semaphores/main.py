@@ -17,7 +17,7 @@ fenetre_helice = None
 
 
 def get_json(route):
-    """envoie une requete get au serveur et lit la reponse avec le parseur maison"""
+    """envoie une requete get au serveur et lit la reponse avec notre parseur maison"""
     try:
         with urllib.request.urlopen(f"{SERVEUR}{route}", timeout=5) as r:
             return lire_json(r.read().decode())
@@ -61,13 +61,15 @@ def ouvrir_table(image_shape):
         fenetre_table.after(200, lambda: table_tracante.charger_depuis_texte(image_shape))
 
 
-def ouvrir_helice(image_shape):
-    """ouvre la fenetre helice si besoin puis charge le csv recu"""
+def ouvrir_helice(image_shape, couleur):
+    """ouvre la fenetre helice si besoin puis charge le csv recu
+    et applique la couleur choisie par le controleur"""
     global fenetre_helice
     import helice as helice_module
     if fenetre_helice is None or not fenetre_helice.winfo_exists():
         fenetre_helice = ctk.CTkToplevel(root)
         helice_module.lancer(fenetre_helice)
+    helice_module.changer_couleur(couleur[0], couleur[1], couleur[2])
     if image_shape and image_shape not in ["test", ""]:
         fenetre_helice.after(200, lambda: helice_module.charger_depuis_texte(image_shape))
 
@@ -88,6 +90,16 @@ def traiter_mission(m, type_sem, shape):
 
     type_sem = type_sem.lower()
 
+    # on recupere la couleur choisie par le controleur
+    # si elle n est pas precisee on garde un cyan par defaut
+    cr = m.get("color_r")
+    cg = m.get("color_g")
+    cb = m.get("color_b")
+    if cr is None or cg is None or cb is None:
+        couleur = (0, 255, 255)
+    else:
+        couleur = (int(cr), int(cg), int(cb))
+
     if m["semaphore_id"]:
         put("/api/update_semaphore/" + m["semaphore_id"] + "?state=Occupied")
 
@@ -96,7 +108,7 @@ def traiter_mission(m, type_sem, shape):
     elif type_sem in ["table", "tracant"]:
         root.after(0, lambda i=image_shape: ouvrir_table(i))
     elif type_sem == "helice":
-        root.after(0, lambda i=image_shape: ouvrir_helice(i))
+        root.after(0, lambda i=image_shape, c=couleur: ouvrir_helice(i, c))
 
     time.sleep(duree)
 
@@ -124,6 +136,27 @@ def traiter_mission(m, type_sem, shape):
     mission_active = None
 
 
+def doit_demarrer(m):
+    """dit si une mission peut demarrer maintenant
+    en comparant l heure actuelle a son start_date"""
+    debut = m.get("start_date")
+    if not debut:
+        return True
+
+    try:
+        # on uniformise le format avant de le lire
+        texte = debut.replace("T", " ")
+        if texte.endswith("Z"):
+            texte = texte[:-1]
+        texte = texte.split(".")[0]
+        date_debut = datetime.strptime(texte, "%Y-%m-%d %H:%M:%S")
+        return datetime.now() >= date_debut
+    except:
+        # si jamais le format est illisible on laisse demarrer
+        # plutot que de bloquer toutes les missions a cause d une
+        return True
+
+
 def surveiller_serveur():
     """boucle qui tourne toutes les 2 secondes et cherche une mission en attente
     si elle en trouve une elle la lance dans un nouveau thread"""
@@ -147,6 +180,11 @@ def surveiller_serveur():
                 shape_id = m.get("shapes_id") or m.get("shape_id")
 
                 if etat == "pending_semaphore":
+                    # on ne lance la mission que si son heure de
+                    # debut fixee par le controleur est deja passee
+                    if not doit_demarrer(m):
+                        continue
+
                     if shape_id and shape_id in shapes_dict:
                         shape = shapes_dict[shape_id]
                         sem_id = m["semaphore_id"]
@@ -174,8 +212,3 @@ root.withdraw()
 threading.Timer(0, surveiller_serveur).start()
 
 root.mainloop()
-
-# main.py — le cerveau. Il demande l'IP, surveille le serveur en boucle (surveiller_serveur),
-# et quand une mission arrive il décide quoi faire (traiter_mission) et ouvre la bonne fenêtre 
-# (ouvrir_symbole, ouvrir_table, ouvrir_helice). C'est le seul fichier qui parle au serveur 
-# via get_json et put.
