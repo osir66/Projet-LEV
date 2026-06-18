@@ -3,6 +3,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+/**
+Classe utilitaire gérant toutes les communications HTTP avec le serveur.
+**/
 public class Web {
     private final HttpClient httpClient;
     private final String baseUrl;
@@ -12,6 +15,9 @@ public class Web {
         this.baseUrl = baseUrl;
     }
 
+    /**
+    Envoie une requête HTTP GET pour récupérer des données.
+    **/
     public String requeteGet(String endpoint) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(baseUrl + endpoint))
@@ -22,6 +28,9 @@ public class Web {
         return response.body();
     }
 
+    /**
+    Envoie une requête HTTP POST pour créer des données.
+    **/
     public String requetePost(String endpoint, String jsonBody) throws Exception {
         String body = (jsonBody == null) ? "" : jsonBody;
         HttpRequest request = HttpRequest.newBuilder()
@@ -34,6 +43,9 @@ public class Web {
         return response.body();
     }
 
+    /**
+    Envoie une requête HTTP PUT pour mettre à jour l'état sur le serveur.
+    **/
     public String requetePut(String endpoint, String jsonBody) throws Exception {
         String body = (jsonBody == null) ? "" : jsonBody;
         HttpRequest request = HttpRequest.newBuilder()
