@@ -180,7 +180,7 @@ async def import_shape_csv(file: UploadFile = File(...)):
     fichier_contenu = await file.read()
     c.write_bytes(fichier_contenu)
     
-    resultat = db.import_csv(str(c))
+    db.import_csv(str(c))
     return RedirectResponse(url="/commande", status_code=303)
 
 #-----------------------------------------------------------------------------------
