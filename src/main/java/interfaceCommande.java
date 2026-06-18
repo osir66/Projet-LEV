@@ -2,7 +2,10 @@ import javafx.application.Platform;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
 import javafx.geometry.Pos;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class interfaceCommande extends VBox {
     TextField urlBase;
@@ -10,6 +13,10 @@ public class interfaceCommande extends VBox {
     TextField temps;
     TextField equipe;
     TextField nomMission;
+    DatePicker datePicker;
+    Spinner<Integer> spinnerHeure;
+    Spinner<Integer> spinnerMinute;
+    ColorPicker colorPicker;
     Button btnRechercher;
     Button Envoyer;
     ListView<semaphore> listeSemaphores;
@@ -91,6 +98,28 @@ public class interfaceCommande extends VBox {
         HBox hboxEquipe = new HBox(equipeLabel, equipe);
         hboxEquipe.setAlignment(Pos.CENTER);
         hboxEquipe.setSpacing(10);
+
+        // Date et heure de début
+        Label dateLabel = new Label("Date de début :");
+        datePicker = new DatePicker(LocalDate.now());
+        spinnerHeure = new Spinner<>(0, 23, LocalDateTime.now().getHour());
+        spinnerHeure.setPrefWidth(65);
+        spinnerHeure.setEditable(true);
+        spinnerMinute = new Spinner<>(0, 59, LocalDateTime.now().getMinute());
+        spinnerMinute.setPrefWidth(65);
+        spinnerMinute.setEditable(true);
+        Label hLabel = new Label("h");
+        Label mLabel = new Label("m");
+        HBox hboxDate = new HBox(dateLabel, datePicker, spinnerHeure, hLabel, spinnerMinute, mLabel);
+        hboxDate.setAlignment(Pos.CENTER);
+        hboxDate.setSpacing(6);
+
+        // Couleur
+        Label colorLabel = new Label("Couleur :");
+        colorPicker = new ColorPicker(Color.RED);
+        HBox hboxColor = new HBox(colorLabel, colorPicker);
+        hboxColor.setAlignment(Pos.CENTER);
+        hboxColor.setSpacing(10);
         // Liste sémaphores avec RadioButton
         groupSemaphores = new ToggleGroup();
         listeSemaphores = new ListView<>();
@@ -160,6 +189,14 @@ public class interfaceCommande extends VBox {
             String ip = urlBase.getText().trim();
             String portVal = port.getText().trim();
 
+            final String startDate = datePicker.getValue() == null ? "" :
+                    String.format("%sT%02d:%02d:00", datePicker.getValue().toString(),
+                            spinnerHeure.getValue(), spinnerMinute.getValue());
+            Color couleur = colorPicker.getValue();
+            int r = (int) Math.round(couleur.getRed()   * 255);
+            int g = (int) Math.round(couleur.getGreen() * 255);
+            int b = (int) Math.round(couleur.getBlue()  * 255);
+
             new Thread(() -> {
                 try {
                     new Communication1(ip, portVal).envoieMission(
@@ -167,7 +204,9 @@ public class interfaceCommande extends VBox {
                             semSelect.getSemaphore_id(),
                             Integer.parseInt(temps.getText().isEmpty() ? "0" : temps.getText()),
                             equipe.getText().trim(),
-                            formeSelect.id()
+                            formeSelect.id(),
+                            startDate,
+                            r, g, b
                     );
                     log("Mission \"" + nomMission.getText().trim() + "\" envoyée avec succès.");
                 } catch (Exception ex) {
@@ -188,6 +227,8 @@ public class interfaceCommande extends VBox {
                 listes,
                 hboxtemps,
                 hboxEquipe,
+                hboxDate,
+                hboxColor,
                 hboxEnvoyer,
                 consoleBox
         );
