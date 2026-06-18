@@ -181,9 +181,7 @@ async def import_shape_csv(file: UploadFile = File(...)):
     c.write_bytes(fichier_contenu)
     
     resultat = db.import_csv(str(c))
-    if resultat is None:
-        return "fichier introuvable "
-    return resultat
+    return RedirectResponse(url="/commande", status_code=303)
 
 #-----------------------------------------------------------------------------------
 
